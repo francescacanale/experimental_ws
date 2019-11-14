@@ -1,0 +1,7 @@
+float64 my_position_x
+float64 my_position_y
+---
+int64 target_x
+int64 target_y
+int64 vel_x
+int64 vel_y
