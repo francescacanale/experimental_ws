@@ -18,6 +18,7 @@ find_package(catkin REQUIRED COMPONENTS
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
+SET(OpenCV_DIR /home/pi/opencv/installation/OpenCV-3.4.4/share/OpenCV/)
 find_package (OpenCV REQUIRED)
 
 
