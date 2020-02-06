@@ -2,8 +2,7 @@
 
 # Python libs
 import sys, time
-from std_msgs.msg import Float32MultiArray
-from std_msgs.msg import String
+from ass_2.msg import Translation
 
 # numpy and scipy
 import numpy as np
@@ -29,10 +28,7 @@ class image_feature:
         '''Initialize ros publisher, ros subscriber'''
 
 	# Topic where we publish the translation vector
-	self.translation_pub = rospy.Publisher("translation", Float32MultiArray, queue_size=10) 
-
-	# Topic where we publish a string
-	self.pub = rospy.Publisher("chatter", String, queue_size=10) 
+	self.translation_pub = rospy.Publisher("translation", Translation, queue_size=10) 
 
         # Topic where we publish
         self.image_pub = rospy.Publisher("/output/image_raw/compressed", CompressedImage, queue_size=1)
@@ -71,12 +67,6 @@ class image_feature:
 		cv2.CHAIN_APPROX_SIMPLE)
 	cnts = imutils.grab_contours(cnts)
 	center = None
-	translation = Float32MultiArray()
-
-	# Publishing a string
-	stringa='ciao'
-	self.pub.publish(stringa)
-
 
 	# Only proceed if at least one contour was found
 	if len(cnts) > 0:
@@ -110,12 +100,11 @@ class image_feature:
 			# Calling solvePnP, it computes T between the object frame and the camera
 			(_, rotation_vector, translation_vector) = cv2.solvePnP(object_point, image_point , self.camera_matrix, self.dist_coefs)
 			
-			translation.layout = 'objectPosition'
-			translation.data = translation_vector
-
 			# Printing translation vector
 			print '\nTranslation vector: '
-			print translation
+			print translation_vector
+
+			translation = [float(translation_vector[0]), float(translation_vector[1]), float(translation_vector[2])]
 
 			# Publishing the translation vector
 			self.translation_pub.publish(translation)
