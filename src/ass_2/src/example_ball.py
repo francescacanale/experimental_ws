@@ -53,9 +53,9 @@ class image_feature:
         np_arr = np.fromstring(ros_data.data, np.uint8)
         image_np = cv2.imdecode(np_arr, cv2.IMREAD_COLOR) # OpenCV >= 3.0:
 
-	# Defining BLUE range
-	greenLower = (100, 150, 50)
-	greenUpper = (140, 255, 255)
+	# Defining RED range
+	greenLower = (255, 0, 0)         #BLUE  100, 150, 50
+	greenUpper = (190,255,255)     #      140, 255, 255
 
 	blurred = cv2.GaussianBlur(image_np, (11, 11), 0)
 	hsv = cv2.cvtColor(blurred, cv2.COLOR_BGR2HSV)
@@ -104,21 +104,15 @@ class image_feature:
 			print '\nTranslation vector: '
 			print translation_vector
 
-			translation = [float(translation_vector[0]), float(translation_vector[1]), float(translation_vector[2])]
+			# translation = [float(translation_vector[0]), float(translation_vector[1]), float(translation_vector[2])]
 
 			# Publishing the translation vector
-			self.translation_pub.publish(translation)
-
-
+			self.translation_pub.publish(float(translation_vector[0]), float(translation_vector[1]), float(translation_vector[2]))
  
 	# update the points queue
 	#pts.appendleft(center)
         cv2.imshow('window', image_np)
         cv2.waitKey(2)
-
-
-
-
 
      
         #self.subscriber.unregister()
