@@ -36,12 +36,18 @@ void alignment(float yaw, double robot_yaw) {
 	// Misalignment between the orientation of the robot and the line ball-porta
 	float misalignment = yaw - robot_yaw;
 
-	if(abs(misalignment) < (M_PI - 0.02) && abs(misalignment) > 0.02) {
+	if(robot_yaw > yaw + 0.1 && robot_yaw < yaw + M_PI - 0.1 && abs(misalignment) > 0.1) {
+		cout<<"A\n";
 		geometry_msgs::Twist vel;
-		vel.angular.z = 0.5 * misalignment;
+		vel.angular.z = 0.5 * abs(misalignment);
 		pub.publish(vel);
 	}
-
+	else if ((robot_yaw > yaw + M_PI + 0.1 || robot_yaw < yaw - 0.1) && abs(misalignment) > 0.1) {
+		cout<<"B\n";
+		geometry_msgs::Twist vel;
+		vel.angular.z = - 0.5 * abs(misalignment);
+		pub.publish(vel);
+	}
 	else {
 		aligned = true;
 		geometry_msgs::Twist vel;
@@ -57,6 +63,7 @@ void moveToTrajectory(float q) {
 	//y coordinate at the origin of the line of the aligned robot
 	float p = -m*robot[0] + robot[1];
 	float distance = q - p;
+	int sign_v = 0;
 
 	// Computing if the robot after translation will be behind/ahead the ball
 	bool behind;
@@ -64,37 +71,47 @@ void moveToTrajectory(float q) {
 	float y_robot_new;
 	float dis_rette = abs(p-q)/sqrt(pow(m,2) + 1);
 
-	// Case 1: Robot on the right side of the ball
-	if (robot[0] >= ball [0]) {
-		if (robot[1] <= ball[1]) {
-			behind = true;
+	// Case 1: P>Q
+	if (p>q) {
+		if (m>0) {
+			y_robot_new = robot[1] - dis_rette*sin(M_PI/2-m);
+			sign_v = -1;
 		}
 		else {
-			behind = false;
+			y_robot_new = robot[1] - dis_rette*sin(m-M_PI/2);
+			sign_v = 1;
 		}
-	}
-	// Case 2: Robot on the left side of the ball
-	else {
 		if (robot[1] < ball[1]) { // If the robot is now behind the ball
-			cout<<"BEHIND\n";
 			y_ball_robot = ball[1];
-			cout<<"\nBALL ROBOT: ";
-			cout<<y_ball_robot; 
-			y_robot_new = robot[1] + dis_rette*sin(m-M_PI/2);
-			cout<<"\nROBOT: ";
-			cout<<y_robot_new;
 		}
 		else { // If the robot is now ahead the ball
-			cout<<"AHEAD\n";
 			y_ball_robot = robot[1];
-			cout<<"\nBALL ROBOT: ";
-			cout<<y_ball_robot; 
+		}
+		if(y_ball_robot < y_robot_new) {
+			behind = false;
+		}
+		else {
+			behind = true;
+		}
+	}
+	// Case 2: P<Q
+	else {
+		if (m>0) {
+			y_robot_new = robot[1] + dis_rette*sin(M_PI/2-m);
+			sign_v = 1;
+		}
+		else {
 			y_robot_new = robot[1] + dis_rette*sin(m-M_PI/2);
-			cout<<"\nROBOT: ";
-			cout<<y_robot_new;
+			sign_v = -1;
+		}
+		if (robot[1] < ball[1]) { // If the robot is now behind the ball
+			y_ball_robot = ball[1];
+		}
+		else { // If the robot is now ahead the ball
+			y_ball_robot = robot[1];
 		}
 
-		if(y_ball_robot < y_robot_new) {
+		if(y_ball_robot < y_robot_new + 0.5) {
 			behind = false;
 		}
 		else {
@@ -106,25 +123,29 @@ void moveToTrajectory(float q) {
 	if (behind == false) {
 		geometry_msgs::Twist vel;
 		vel.linear.x = -1;
+		vel.linear.y = 0;
 		pub.publish(vel);
 	}
 	// When it is behind it has to do nothing
 	else {
 		geometry_msgs::Twist vel;
 		vel.linear.x = 0;
+		vel.linear.y = 0;
 		pub.publish(vel);
 	}
 
 	// If the robot is aligned and behind the ball it has to go on the trajectory ball-porta
-	if(aligned && behind == true) {
+	if(aligned && behind) {
 		if (abs(distance) > 0.04) {
 			geometry_msgs::Twist vel;
-			vel.linear.y = 0.5 * distance;
+			vel.linear.y = 0.5 * abs(distance) * sign_v;
+			vel.linear.x = 0;
 			pub.publish(vel);
 		}
 		else {
 			onTrajectory = true;
 			geometry_msgs::Twist vel;
+			vel.linear.x = 0;
 			vel.linear.y = 0;
 			pub.publish(vel);
 		}
@@ -143,13 +164,14 @@ void kick() {
 	if(distance > 0.25 && iannone == false) {
 		geometry_msgs::Twist vel;
 		vel.linear.x = 1;
+		vel.linear.y = 0;
 		pub.publish(vel);
 	}
 	else {
 		iannone = true;
-		cout<<"IANNONE TRUE\n";
 		geometry_msgs::Twist vel;
 		vel.linear.x = 0;
+		vel.linear.y = 0;
 		pub.publish(vel);
 	}
 
