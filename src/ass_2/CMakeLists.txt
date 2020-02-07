@@ -143,6 +143,7 @@ include_directories(
 # add_executable(${PROJECT_NAME}_node src/ass_2_node.cpp)
  add_executable(${PROJECT_NAME}_node src/example.cpp)
  add_executable(${PROJECT_NAME}_node_t src/example_transport.cpp)
+ add_executable(node_controller src/controller_node.cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -161,6 +162,10 @@ include_directories(
 
  target_link_libraries(${PROJECT_NAME}_node_t
    ${catkin_LIBRARIES} ${OpenCV_LIBRARIES}
+ )
+
+ target_link_libraries(node_controller
+   ${catkin_LIBRARIES}
  )
 
 #############

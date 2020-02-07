@@ -26,7 +26,7 @@
      			<geometry>
        				<box size="0.2 .3 .1"/>
      			</geometry>
-			<origin rpy="0 0 0" xyz="0 0 0.05"/>
+			<origin rpy="0 0 1.5707" xyz="0 0 0.05"/>
 			<material name="white">
 				<color rgba="1 1 1 1"/>
 			</material>
@@ -43,7 +43,7 @@
  	<link name="wheel_1">
    		<visual>
      			<xacro:wheel_geometry />
-			<origin rpy="0 1.5707 0" xyz="0.0 0.0 0"/>
+			<origin rpy="0 1.5707 1.5707" xyz="0.0 0.0 0"/>
    			<material name="black">
 				<color rgba="0 0 0 1"/>
 			</material>
@@ -57,7 +57,7 @@
  	<link name="wheel_2">
    		<visual>
      			<xacro:wheel_geometry />
-			<origin rpy="0 1.5707 0" xyz="-0.0 0.0 0"/>
+			<origin rpy="0 1.5707 1.5707" xyz="-0.0 0.0 0"/>
    			<material name="black"/>
    		</visual>
 		<collision>
@@ -69,7 +69,7 @@
  	<link name="wheel_3">
    		<visual>
  			<xacro:wheel_geometry />
-			<origin rpy="0 1.5707 0" xyz="0.0 -0.0 0"/>
+			<origin rpy="0 1.5707 1.5707" xyz="0.0 -0.0 0"/>
    			<material name="black"/>
    		</visual>
 		<collision>
@@ -81,7 +81,7 @@
  	<link name="wheel_4">
    		<visual>
   			 <xacro:wheel_geometry />
-			<origin rpy="0 1.5707 0" xyz="-0.0 -0.0 0"/>
+			<origin rpy="0 1.5707 1.5707" xyz="-0.0 -0.0 0"/>
    			<material name="black"/>
    		</visual>
 		<collision>

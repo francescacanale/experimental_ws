@@ -23,7 +23,7 @@
   <param name="tf_prefix" value="robot_tf" />
   	<node name="urdf_spawner" pkg="gazebo_ros" type="spawn_model" respawn="false" output="screen"
 	args="-urdf -model $(arg ns1) -param robot_description -x $(arg x) -y $(arg y) -z 0.05"/>
-        <!-- <node name="controller" pkg="ass_1" type="node1" output="screen"/> -->
+        <node name="controller" pkg="ass_2" type="node_controller" output="screen"/>
 
   </group>
 
