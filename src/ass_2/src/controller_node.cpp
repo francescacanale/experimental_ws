@@ -36,16 +36,16 @@ void alignment(float yaw, double robot_yaw) {
 	// Misalignment between the orientation of the robot and the line ball-porta
 	float misalignment = yaw - robot_yaw;
 
-	if(robot_yaw > yaw + 0.1 && robot_yaw < yaw + M_PI - 0.1 && abs(misalignment) > 0.1) {
+	if(robot_yaw > yaw + 0.05 && robot_yaw < yaw + M_PI - 0.05 && abs(misalignment) > 0.05) {
 		cout<<"A\n";
 		geometry_msgs::Twist vel;
-		vel.angular.z = 0.5 * abs(misalignment);
+		vel.angular.z = - 0.2 * misalignment;
 		pub.publish(vel);
 	}
-	else if ((robot_yaw > yaw + M_PI + 0.1 || robot_yaw < yaw - 0.1) && abs(misalignment) > 0.1) {
+	else if ((robot_yaw > yaw + M_PI + 0.05 || robot_yaw < yaw - 0.05) && abs(misalignment) > 0.05) {
 		cout<<"B\n";
 		geometry_msgs::Twist vel;
-		vel.angular.z = - 0.5 * abs(misalignment);
+		vel.angular.z = + 0.2 * misalignment;
 		pub.publish(vel);
 	}
 	else {
@@ -122,7 +122,7 @@ void moveToTrajectory(float q) {
 	// If the robot is not behind it has to go back
 	if (behind == false) {
 		geometry_msgs::Twist vel;
-		vel.linear.x = -1;
+		vel.linear.x = -0.5;
 		vel.linear.y = 0;
 		pub.publish(vel);
 	}
@@ -136,9 +136,9 @@ void moveToTrajectory(float q) {
 
 	// If the robot is aligned and behind the ball it has to go on the trajectory ball-porta
 	if(aligned && behind) {
-		if (abs(distance) > 0.04) {
+		if (abs(distance) > 0.1) {
 			geometry_msgs::Twist vel;
-			vel.linear.y = 0.5 * abs(distance) * sign_v;
+			vel.linear.y = 0.3 * abs(distance) * sign_v;
 			vel.linear.x = 0;
 			pub.publish(vel);
 		}
