@@ -25,8 +25,10 @@ ros::Subscriber positions_sub;
 
 bool object_detected = false;
 bool aligned = false;
+bool onTrajectory = false;
+bool iannone = false;
 double robot_roll, robot_pitch, robot_yaw;
-float yaw;
+float yaw, q, m;
 
 
 float *ball= new float [2]; //Variable to store the ball position
@@ -36,23 +38,76 @@ float *robot= new float [2]; //Variable to store the robot position
 
 // Function to align the robot
 void alignment(float yaw, double robot_yaw) {
-	cout<<"SONO NELLA FUNZIONE";
 	
+	// Misalignment between the orientation of the robot and the line ball-porta
 	float misalignment = yaw - robot_yaw;
 
-	if(abs(misalignment) < (M_PI - 0.01) && abs(misalignment) > 0.01) {
+	if(abs(misalignment) < (M_PI - 0.02) && abs(misalignment) > 0.02) {
 		geometry_msgs::Twist vel;
 		vel.angular.z = 0.5 * misalignment;
 		pub.publish(vel);
-		cout<<"FACCIO GIRAREEEEEEE";
 	}
 
-	else
+	else {
 		aligned = true;
+		geometry_msgs::Twist vel;
+		vel.angular.z = 0;
+		pub.publish(vel);
+	}
+}
+
+// Function to move the robot to the trajectory ball-porta
+void moveToTrajectory(float q) {
+
+	//y coordinate at the origin of the line of the aligned robot
+	float p = -m*robot[0] + robot[1];
+
+	float distance = q - p;
+	
+	if(aligned) {
+		if (abs(distance) > 0.04) {
+			geometry_msgs::Twist vel;
+			vel.linear.y = 0.5 * distance;
+			pub.publish(vel);
+		}
+		else {
+			onTrajectory = true;
+			geometry_msgs::Twist vel;
+			vel.linear.y = 0;
+			pub.publish(vel);
+		}
+	}
+}
+
+// Function to kick the ball
+void kick() {
+
+
+
+	if (behind == true) {
+		if(distance > 0.25 && iannone == false) {
+			geometry_msgs::Twist vel;
+			vel.linear.x = 1;
+			pub.publish(vel);
+		}
+		else {
+			iannone = true;
+			cout<<"IANNONE TRUE\n";
+			geometry_msgs::Twist vel;
+			vel.linear.x = 0;
+			pub.publish(vel);
+		}
+	}
+	else {
+		geometry_msgs::Twist vel;
+		vel.linear.x = -1;
+		pub.publish(vel);
+	}
+
 }
 
 
-// Callback for the odometry messages
+// Callback for the odometry of the robot
 void odomCallback(const nav_msgs::Odometry::ConstPtr& msg)
    {	
 	//Computing pose robot
@@ -60,20 +115,31 @@ void odomCallback(const nav_msgs::Odometry::ConstPtr& msg)
     robot[1] = msg->pose.pose.position.y;
 
 	// Computing orientation robot
-	tf::Quaternion q(msg->pose.pose.orientation.x, msg->pose.pose.orientation.y, msg->pose.pose.orientation.z, msg->pose.pose.orientation.w);
-	tf::Matrix3x3 m(q);
+	tf::Quaternion t(msg->pose.pose.orientation.x, msg->pose.pose.orientation.y, msg->pose.pose.orientation.z, msg->pose.pose.orientation.w);
+	tf::Matrix3x3 m(t);
 	m.getRPY(robot_roll, robot_pitch, robot_yaw);
-	cout<<"Yaw robot = ";
-	cout<<robot_yaw;
-	cout<<"\n";
 
 	if (aligned == false) {
 		// Calling the function to align the robot
 		alignment(yaw, robot_yaw);
 	}
 	else {
-		cout<<"I'm alinged";
-        // Parrtire dritto
+		cout<<"I'm alinged\n";
+
+		if (onTrajectory == false) {
+			// Calling the function to move the robot to trajectory ball-porta
+			moveToTrajectory(q);
+		}
+		else {
+			cout<<"I'm on trajectory\n";
+
+			if (iannone == false) {
+				// Calling the function to kick the ball
+				kick();
+				}
+			else
+				cout<<"BOOOOM\n";
+		}
 	}
 }
 
@@ -83,6 +149,7 @@ void modelCallback(const gazebo_msgs::ModelStates::ConstPtr& msg)
 	//Position of the ball
     ball[0] = msg->pose[1].position.x;
     ball[1] = msg->pose[1].position.y;
+	//ball[2] = msg->twist[1].
 
 	//Position of the porta
     porta[0] = msg->pose[2].position.x;
@@ -91,13 +158,11 @@ void modelCallback(const gazebo_msgs::ModelStates::ConstPtr& msg)
 	object_detected = true;
 
 	if(object_detected) {
-		float m = (porta[1]-ball[1])/(porta[0]-ball[0]); //Angular coefficent of the misalignment
+		m = (porta[1]-ball[1])/(porta[0]-ball[0]); //Angular coefficent of the misalignment line
+		q = (porta[0]*ball[1] - ball[0]*porta[1])/(porta[0] - ball[0]); //y coordinates at the origin of the misalignment line
 		yaw = atan(m); //Yaw angle wrt y axis of the world frame
-		cout<<"Yaw = ";
-		cout<<yaw;
-		cout<<"\n";
 	}
-}	
+}
 	
 
 int main(int argc, char **argv)
