@@ -2,7 +2,6 @@
 #include "geometry_msgs/Twist.h"
 #include "nav_msgs/Odometry.h"
 #include "gazebo_msgs/ModelStates.h"
-//#include "ass_1/GetPosition.h"
 #include <std_msgs/Int32.h>
 #include <tf/transform_listener.h>
 
@@ -17,11 +16,6 @@ using namespace std;
 
 ros::Publisher pub;
 ros::Subscriber positions_sub;
-//ros::ServiceClient client;
-
-// Needed only in the real world:
-//ros::Subscriber sub_ball;
-//ros::Subscriber sub_robot;
 
 bool object_detected = false;
 bool aligned = false;
@@ -56,15 +50,73 @@ void alignment(float yaw, double robot_yaw) {
 	}
 }
 
+
 // Function to move the robot to the trajectory ball-porta
 void moveToTrajectory(float q) {
 
 	//y coordinate at the origin of the line of the aligned robot
 	float p = -m*robot[0] + robot[1];
-
 	float distance = q - p;
-	
-	if(aligned) {
+
+	// Computing if the robot after translation will be behind/ahead the ball
+	bool behind;
+	float y_ball_robot;
+	float y_robot_new;
+	float dis_rette = abs(p-q)/sqrt(pow(m,2) + 1);
+
+	// Case 1: Robot on the right side of the ball
+	if (robot[0] >= ball [0]) {
+		if (robot[1] <= ball[1]) {
+			behind = true;
+		}
+		else {
+			behind = false;
+		}
+	}
+	// Case 2: Robot on the left side of the ball
+	else {
+		if (robot[1] < ball[1]) { // If the robot is now behind the ball
+			cout<<"BEHIND\n";
+			y_ball_robot = ball[1];
+			cout<<"\nBALL ROBOT: ";
+			cout<<y_ball_robot; 
+			y_robot_new = robot[1] + dis_rette*sin(m-M_PI/2);
+			cout<<"\nROBOT: ";
+			cout<<y_robot_new;
+		}
+		else { // If the robot is now ahead the ball
+			cout<<"AHEAD\n";
+			y_ball_robot = robot[1];
+			cout<<"\nBALL ROBOT: ";
+			cout<<y_ball_robot; 
+			y_robot_new = robot[1] + dis_rette*sin(m-M_PI/2);
+			cout<<"\nROBOT: ";
+			cout<<y_robot_new;
+		}
+
+		if(y_ball_robot < y_robot_new) {
+			behind = false;
+		}
+		else {
+			behind = true;
+		}
+	}
+
+	// If the robot is not behind it has to go back
+	if (behind == false) {
+		geometry_msgs::Twist vel;
+		vel.linear.x = -1;
+		pub.publish(vel);
+	}
+	// When it is behind it has to do nothing
+	else {
+		geometry_msgs::Twist vel;
+		vel.linear.x = 0;
+		pub.publish(vel);
+	}
+
+	// If the robot is aligned and behind the ball it has to go on the trajectory ball-porta
+	if(aligned && behind == true) {
 		if (abs(distance) > 0.04) {
 			geometry_msgs::Twist vel;
 			vel.linear.y = 0.5 * distance;
@@ -79,28 +131,25 @@ void moveToTrajectory(float q) {
 	}
 }
 
+
 // Function to kick the ball
 void kick() {
 
+	// Distance between the robot and the ball
+	float distance = sqrt(pow(ball[0]-robot[0],2) + pow(ball[1]-robot[1],2));
+	cout<<"\nDistance: ";
+	cout<<distance;
 
-
-	if (behind == true) {
-		if(distance > 0.25 && iannone == false) {
-			geometry_msgs::Twist vel;
-			vel.linear.x = 1;
-			pub.publish(vel);
-		}
-		else {
-			iannone = true;
-			cout<<"IANNONE TRUE\n";
-			geometry_msgs::Twist vel;
-			vel.linear.x = 0;
-			pub.publish(vel);
-		}
+	if(distance > 0.25 && iannone == false) {
+		geometry_msgs::Twist vel;
+		vel.linear.x = 1;
+		pub.publish(vel);
 	}
 	else {
+		iannone = true;
+		cout<<"IANNONE TRUE\n";
 		geometry_msgs::Twist vel;
-		vel.linear.x = -1;
+		vel.linear.x = 0;
 		pub.publish(vel);
 	}
 
@@ -142,6 +191,7 @@ void odomCallback(const nav_msgs::Odometry::ConstPtr& msg)
 		}
 	}
 }
+
 
 // Callback for the model objects
 void modelCallback(const gazebo_msgs::ModelStates::ConstPtr& msg)
