@@ -10,7 +10,7 @@
     <include>
       <uri>model://frc2016_ball</uri>
       <name>ball</name>
-      <pose>2.0 2.0 0.13 0.0 0.0 0.0</pose>
+      <pose>9.0 3.0 0.13 0.0 0.0 0.0</pose>
     </include>
     <include>
       <uri>model://robocup14_spl_goal</uri>
