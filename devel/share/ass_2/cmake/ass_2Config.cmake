@@ -67,14 +67,14 @@ set(ass_2_CONFIG_INCLUDED TRUE)
 
 # set variables for source/devel/install prefixes
 if("TRUE" STREQUAL "TRUE")
-  set(ass_2_SOURCE_PREFIX /home/filippo/experimental_ws/src/ass_2)
-  set(ass_2_DEVEL_PREFIX /home/filippo/experimental_ws/devel)
+  set(ass_2_SOURCE_PREFIX /home/experimental_ws/src/ass_2)
+  set(ass_2_DEVEL_PREFIX /home/experimental_ws/devel)
   set(ass_2_INSTALL_PREFIX "")
   set(ass_2_PREFIX ${ass_2_DEVEL_PREFIX})
 else()
   set(ass_2_SOURCE_PREFIX "")
   set(ass_2_DEVEL_PREFIX "")
-  set(ass_2_INSTALL_PREFIX /home/filippo/experimental_ws/install)
+  set(ass_2_INSTALL_PREFIX /home/experimental_ws/install)
   set(ass_2_PREFIX ${ass_2_INSTALL_PREFIX})
 endif()
 
@@ -91,9 +91,9 @@ endif()
 # flag project as catkin-based to distinguish if a find_package()-ed project is a catkin project
 set(ass_2_FOUND_CATKIN_PROJECT TRUE)
 
-if(NOT "/home/filippo/experimental_ws/devel/include;/opt/ros/kinetic/include/opencv-3.3.1-dev;/opt/ros/kinetic/include/opencv-3.3.1-dev/opencv " STREQUAL " ")
+if(NOT "/home/experimental_ws/devel/include;/opt/ros/kinetic/include/opencv-3.3.1-dev;/opt/ros/kinetic/include/opencv-3.3.1-dev/opencv " STREQUAL " ")
   set(ass_2_INCLUDE_DIRS "")
-  set(_include_dirs "/home/filippo/experimental_ws/devel/include;/opt/ros/kinetic/include/opencv-3.3.1-dev;/opt/ros/kinetic/include/opencv-3.3.1-dev/opencv")
+  set(_include_dirs "/home/experimental_ws/devel/include;/opt/ros/kinetic/include/opencv-3.3.1-dev;/opt/ros/kinetic/include/opencv-3.3.1-dev/opencv")
   if(NOT " " STREQUAL " ")
     set(_report "Check the issue tracker '' and consider creating a ticket if the problem has not been reported yet.")
   elseif(NOT " " STREQUAL " ")
@@ -110,7 +110,7 @@ if(NOT "/home/filippo/experimental_ws/devel/include;/opt/ros/kinetic/include/ope
         message(FATAL_ERROR "Project 'ass_2' specifies '${idir}' as an include dir, which is not found.  It does not exist in '${include}'.  ${_report}")
       endif()
     else()
-      message(FATAL_ERROR "Project 'ass_2' specifies '${idir}' as an include dir, which is not found.  It does neither exist as an absolute directory nor in '/home/filippo/experimental_ws/src/ass_2/${idir}'.  ${_report}")
+      message(FATAL_ERROR "Project 'ass_2' specifies '${idir}' as an include dir, which is not found.  It does neither exist as an absolute directory nor in '/home/experimental_ws/src/ass_2/${idir}'.  ${_report}")
     endif()
     _list_append_unique(ass_2_INCLUDE_DIRS ${include})
   endforeach()
@@ -121,6 +121,8 @@ foreach(library ${libraries})
   # keep build configuration keywords, target names and absolute libraries as-is
   if("${library}" MATCHES "^(debug|optimized|general)$")
     list(APPEND ass_2_LIBRARIES ${library})
+  elseif(${library} MATCHES "^-l")
+    list(APPEND ass_2_LIBRARIES ${library})
   elseif(TARGET ${library})
     list(APPEND ass_2_LIBRARIES ${library})
   elseif(IS_ABSOLUTE ${library})
@@ -129,7 +131,11 @@ foreach(library ${libraries})
     set(lib_path "")
     set(lib "${library}-NOTFOUND")
     # since the path where the library is found is returned we have to iterate over the paths manually
+<<<<<<< HEAD
     foreach(path /home/filippo/experimental_ws/devel/lib;/home/filippo/experimental_ws/devel/lib;/opt/ros/kinetic/lib)
+=======
+    foreach(path /home/experimental_ws/devel/lib;/home/experimental_ws/devel/lib;/opt/ros/kinetic/lib)
+>>>>>>> 942e284f1df9367654a8bdaa9ad700d4b0fe8ff4
       find_library(lib ${library}
         PATHS ${path}
         NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH)
