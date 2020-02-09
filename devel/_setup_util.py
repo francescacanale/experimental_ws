@@ -268,12 +268,17 @@ if __name__ == '__main__':
             print(e, file=sys.stderr)
             sys.exit(1)
 
+<<<<<<< HEAD
+        # environment at generation time
+        CMAKE_PREFIX_PATH = '/home/filippo/experimental_ws/devel;/opt/ros/kinetic'.split(';')
+=======
         if not args.local:
             # environment at generation time
             CMAKE_PREFIX_PATH = '/home/experimental_ws/devel;/opt/ros/kinetic'.split(';')
         else:
             # don't consider any other prefix path than this one
             CMAKE_PREFIX_PATH = []
+>>>>>>> 942e284f1df9367654a8bdaa9ad700d4b0fe8ff4
         # prepend current workspace if not already part of CPP
         base_path = os.path.dirname(__file__)
         # CMAKE_PREFIX_PATH uses forward slash on all platforms, but __file__ is platform dependent
