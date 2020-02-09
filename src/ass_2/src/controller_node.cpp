@@ -28,11 +28,6 @@ float *porta= new float [2]; //Variable to store the porta position
 float *robot= new float [2]; //Variable to store the robot position
  
 
-float round_cazzo (float var) {
-	float var_rounded = floor(var*10)/10;
-	return var_rounded;
-}
-
 // Function to align the robot
 void alignment(float yaw, double robot_yaw) {
 	
