@@ -15,15 +15,12 @@
 using namespace std;
 
 ros::Publisher pub;
-ros::Subscriber positions_sub;
 
-bool object_detected = false;
 bool aligned = false;
 bool onTrajectory = false;
 bool iannone = false;
 double robot_roll, robot_pitch, robot_yaw;
 float yaw, q, m;
-int flag = 1; // PEr stoppare dopo essere indietreggiato
 
 
 float *ball= new float [2]; //Variable to store the ball position
@@ -67,25 +64,22 @@ void alignment(float yaw, double robot_yaw) {
 // Function to move the robot to the trajectory ball-porta
 void moveToTrajectory(float q) {
 
-	//y coordinate at the origin of the line of the aligned robot
-	float p = -m*robot[0] + robot[1];
-	float distance = q - p;
-	int sign_v = 0;
+	float p = -m*robot[0] + robot[1]; //y coordinate at the origin of the line of the aligned robot
+	float distance_rette = abs(p-q)/sqrt(pow(m,2) + 1);
+	int sign_v = 0; // Sign of the velocities
 
 	// Computing if the robot after translation will be behind/ahead the ball
 	bool behind;
-	float y_ball_robot;
-	float y_robot_new;
-	float dis_rette = abs(p-q)/sqrt(pow(m,2) + 1);
+	float y_robot_new; // y coordinate that the robot will have after the translation
 
 	// Case 1: P>Q
 	if (p>q) {
 		if (m>0) {
-			y_robot_new = robot[1] - abs(dis_rette*sin(M_PI/2-m));
+			y_robot_new = robot[1] - abs(distance_rette*sin(M_PI/2-m));
 			sign_v = -1;
 		}
 		else {
-			y_robot_new = robot[1] - abs(dis_rette*sin(m-M_PI/2));
+			y_robot_new = robot[1] - abs(distance_rette*sin(m-M_PI/2));
 			sign_v = 1;
 		}
 		if(ball[1] < y_robot_new + 0.5) {
@@ -98,11 +92,11 @@ void moveToTrajectory(float q) {
 	// Case 2: P<Q
 	else {
 		if (m>0) {
-			y_robot_new = robot[1] + abs(dis_rette*sin(M_PI/2-m));
+			y_robot_new = robot[1] + abs(distance_rette*sin(M_PI/2-m));
 			sign_v = 1;
 		}
 		else {
-			y_robot_new = robot[1] + abs(dis_rette*sin(m-M_PI/2));
+			y_robot_new = robot[1] + abs(distance_rette*sin(m-M_PI/2));
 			sign_v = -1;
 		}
 		if(ball[1] < y_robot_new + 0.5) {
@@ -113,7 +107,7 @@ void moveToTrajectory(float q) {
 		}
 	}
 
-	// If the robot is not behind it has to go back
+	// If the y_robot_new is not behind the ball, the robot has to go back
 	if (behind == false) {
 		cout<<"INDIETRO\n";
 		geometry_msgs::Twist vel;
@@ -121,27 +115,18 @@ void moveToTrajectory(float q) {
 		vel.linear.y = 0;
 		pub.publish(vel);
 	}
-	// When it is behind it has to do nothing
-	/*else if (behind && flag == 1){
-		cout<<"Indietro arrivato!\n";
-		flag = 0;
-		geometry_msgs::Twist vel;
-		vel.linear.x = 0;
-		vel.linear.y = 0;
-		pub.publish(vel);
-	}*/
 
 	// If the robot is aligned and behind the ball it has to go on the trajectory ball-porta
 	if(aligned && behind) {
-		if (abs(distance) > 0.1) {
+		if (abs(distance_rette) > 0.1) {
 			cout<<"TRASLO\n";
 			geometry_msgs::Twist vel;
-			vel.linear.y = 0.2 * abs(distance) * sign_v;
+			vel.linear.y = 0.2 * abs(distance_rette) * sign_v;
 			vel.linear.x = 0;
 			pub.publish(vel);
 		}
 		else {
-			cout<<"HO traslato\n";
+			cout<<"Ho traslato\n";
 			onTrajectory = true;
 			geometry_msgs::Twist vel;
 			vel.linear.x = 0;
@@ -157,8 +142,8 @@ void kick() {
 
 	// Distance between the robot and the ball
 	float distance = sqrt(pow(ball[0]-robot[0],2) + pow(ball[1]-robot[1],2));
-	cout<<"\nDistance: ";
-	cout<<distance;
+	//cout<<"\nDistance: ";
+	//cout<<distance;
 
 	if(distance > 0.29 && iannone == false) {
 		cout<<"AVANZO\n";
@@ -196,21 +181,18 @@ void odomCallback(const nav_msgs::Odometry::ConstPtr& msg)
 		alignment(yaw, robot_yaw);
 	}
 	else {
-		//cout<<"I'm alinged\n";
 
 		if (onTrajectory == false) {
 			// Calling the function to move the robot to trajectory ball-porta
 			moveToTrajectory(q);
 		}
 		else {
-			//cout<<"I'm on trajectory\n";
 
 			if (iannone == false) {
 				// Calling the function to kick the ball
 				kick();
 				}
 			else {}
-				//cout<<"BOOOOM\n";
 		}
 	}
 }
@@ -228,13 +210,9 @@ void modelCallback(const gazebo_msgs::ModelStates::ConstPtr& msg)
     porta[0] = msg->pose[2].position.x;
     porta[1] = msg->pose[2].position.y;
 
-	object_detected = true;
-
-	if(object_detected) {
-		m = (porta[1]-ball[1])/(porta[0]-ball[0]); //Angular coefficent of the misalignment line
-		q = (porta[0]*ball[1] - ball[0]*porta[1])/(porta[0] - ball[0]); //y coordinates at the origin of the misalignment line
-		yaw = atan(m); //Yaw angle wrt y axis of the world frame
-	}
+	m = (porta[1]-ball[1])/(porta[0]-ball[0]); //Angular coefficent of the line bal--porta
+	q = (porta[0]*ball[1] - ball[0]*porta[1])/(porta[0] - ball[0]); //y coordinates at the origin of the line ball_porta
+	yaw = atan(m); //Yaw angle wrt y axis of the world frame
 }
 	
 
@@ -242,8 +220,6 @@ int main(int argc, char **argv)
 {
 	ros::init(argc, argv, "controller");
 	ros::NodeHandle n;
-
-	setprecision(2);
 
 	// Publisher of the velocities
 	pub = n.advertise<geometry_msgs::Twist>("cmd_vel", 5); 

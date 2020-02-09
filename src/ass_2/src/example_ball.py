@@ -55,7 +55,7 @@ class image_feature:
 
 	# Defining RED range
 	greenLower = (255, 0, 0)         #BLUE  100, 150, 50
-	greenUpper = (190,255,255)     #      140, 255, 255
+	greenUpper = (190,255,255)       #      140, 255, 255
 
 	blurred = cv2.GaussianBlur(image_np, (11, 11), 0)
 	hsv = cv2.cvtColor(blurred, cv2.COLOR_BGR2HSV)
