@@ -37,13 +37,13 @@ void alignment(float yaw, double robot_yaw) {
 	if(robot_yaw > yaw + 0.05 && robot_yaw < yaw + M_PI - 0.05 && abs(misalignment) > 0.05) {
 		cout<<"Clockwise\n";
 		geometry_msgs::Twist vel;
-		vel.angular.z = - 0.5 * misalignment;
+		vel.angular.z = - 1.5 * misalignment/abs(misalignment);
 		pub.publish(vel);
 	}
 	else if ((robot_yaw > yaw + M_PI + 0.05 || robot_yaw < yaw - 0.05) && abs(misalignment) > 0.05) {
 		cout<<"Anticlockwise\n";
 		geometry_msgs::Twist vel;
-		vel.angular.z = + 0.5 * misalignment;
+		vel.angular.z = + 1.5 * misalignment/abs(misalignment);
 		pub.publish(vel);
 	}
 	else {
@@ -106,7 +106,7 @@ void moveToTrajectory(float q) {
 	if (behind == false) {
 		cout<<"INDIETRO\n";
 		geometry_msgs::Twist vel;
-		vel.linear.x = -0.5;
+		vel.linear.x = -1.5;
 		vel.linear.y = 0;
 		pub.publish(vel);
 	}
@@ -116,7 +116,7 @@ void moveToTrajectory(float q) {
 		if (abs(distance_rette) > 0.1) {
 			cout<<"TRASLO\n";
 			geometry_msgs::Twist vel;
-			vel.linear.y = 0.2 * abs(distance_rette) * sign_v;
+			vel.linear.y = 1.5 * sign_v;
 			vel.linear.x = 0;
 			pub.publish(vel);
 		}
@@ -143,7 +143,7 @@ void kick() {
 	if(distance > 0.29 && iannone == false) {
 		cout<<"AVANZO\n";
 		geometry_msgs::Twist vel;
-		vel.linear.x = 1;
+		vel.linear.x = 1.5;
 		vel.linear.y = 0;
 		pub.publish(vel);
 	}

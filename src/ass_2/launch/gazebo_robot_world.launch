@@ -13,6 +13,7 @@
   <!-- defining the position of the robot -->
   <arg name="x" default="5"/>
   <arg name="y" default="4"/>
+  <arg name="yaw" default="0"/>
 
   <!-- Load the URDF into the ROS Parameter Server -->
   <param name="$(arg ns1)/robot_description" 
@@ -22,7 +23,7 @@
   <group ns="$(arg ns1)">
   <param name="tf_prefix" value="robot_tf" />
   	<node name="urdf_spawner" pkg="gazebo_ros" type="spawn_model" respawn="false" output="screen"
-	args="-urdf -model $(arg ns1) -param robot_description -x $(arg x) -y $(arg y) -z 0.05"/>
+	args="-urdf -model $(arg ns1) -param robot_description -x $(arg x) -y $(arg y) -z 0.05 -Y $(arg yaw)"/>
         <node name="controller" pkg="ass_2" type="node_controller" output="screen"/>
 
   </group>
