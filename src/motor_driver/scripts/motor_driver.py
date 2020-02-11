@@ -19,23 +19,23 @@ class driver:
 
     # get cmd_vel message, and get linear velocity and angular velocity
     def get_cmd_vel(self, data):
-        x = data.linear.x               #linear vel cmd  
-        y = data.y.z                    #angular vel, not necessary for us (olonomic)
-        self.send_cmd_to_arduino(x, y)  #send the command of x and y to arduino 
+        x = data.linear.x               # linear vel cmd along x-axis
+        y = data.linear.y               # linear vel cmd along y-axis
+	angular = data.angular.z        # angular vel cmd
+        self.send_cmd_to_arduino(x, y, angular)  #send the command to arduino 
 
-    # translate x, and angular velocity to PWM signal of each wheels, and send to arduino
-    def send_cmd_to_arduino(self, x, angular):
-        # DA CONTROLLARE NON SONO PER NIENTE SICURO
+    # translate x, y, and angular velocity to PWM signal of each wheels, and send to arduino
+    def send_cmd_to_arduino(self, x, y, angular):
         # calculate right and left wheels' signal
-        ant_right = int((x + y) * 50)   #signal to ant-right 
-        ant_left = int((x - y) * 50)    #signal to ant-left
-        post_right = int((x - y) * 50)  #signal to post-right
-        post_left = int((x + y) * 50)   #signal to post-left
-        
+        ant_left = int((x - y - angular) * 80)   #signal to ant-left 
+        ant_right = int((x + y + angular) * 80)  #signal to ant-right
+        post_left = int((x + y - angular) * 80)  #signal to post-left
+        post_right = int((x - y + angular) * 80) #signal to post-right
+
         # format for arduino
-        message = "{},{},{},{}*".format(ant_right, ant_left, post_right, post_left) #create the string for arduino  
+        message = "{},{},{},{}*".format(ant_left, ant_right, post_left, post_right) #create the string for arduino  
         print message
-        
+
         # send by serial 
         self.ser.write(message) #message via USB
 

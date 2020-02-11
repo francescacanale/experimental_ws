@@ -7,25 +7,20 @@
     <arg name="paused" value="true"/>
   </include>
 
-  <!-- defining the namespaces of the robot -->
-  <arg name="ns1" value="robot"/>
-
   <!-- defining the position of the robot -->
+  <arg name="model" default="$(find ass_2)/urdf/robot.xacro" />
   <arg name="x" default="5"/>
   <arg name="y" default="4"/>
   <arg name="yaw" default="0"/>
 
   <!-- Load the URDF into the ROS Parameter Server -->
-  <param name="$(arg ns1)/robot_description" 
+  <param name="robot_description" 
 	 command="$(find xacro)/xacro --inorder $(find ass_2)/urdf/robot.xacro" />
 
   <!-- launching the spawner and the controller for the robot -->
-  <group ns="$(arg ns1)">
   <param name="tf_prefix" value="robot_tf" />
   	<node name="urdf_spawner" pkg="gazebo_ros" type="spawn_model" respawn="false" output="screen"
-	args="-urdf -model $(arg ns1) -param robot_description -x $(arg x) -y $(arg y) -z 0.05 -Y $(arg yaw)"/>
+	args="-urdf -model robot -param robot_description -x $(arg x) -y $(arg y) -z 0.05 -Y $(arg yaw)"/>
         <node name="controller" pkg="ass_2" type="node_controller" output="screen"/>
-
-  </group>
 
 </launch>

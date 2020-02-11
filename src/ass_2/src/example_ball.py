@@ -9,6 +9,7 @@ import numpy as np
 from scipy.ndimage import filters
 
 import imutils
+import statistics
 
 # OpenCV
 import cv2
@@ -42,6 +43,9 @@ class image_feature:
 	self.camera_matrix = np.array([[322.0704122808738, 0., 199.2680620421962], [0., 320.8673986158544, 155.2533082600705], [0., 0., 1.]])
 	self.dist_coefs = np.array([0.1639958233797625, -0.271840030972792, 0.001055841660100477, -0.00166555973740089, 0.])
 
+	self.i=0
+	self.moda=0
+	self.z_vector=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 
     def callback(self, ros_data):
         '''Callback function of subscribed topic. 
@@ -54,12 +58,12 @@ class image_feature:
         image_np = cv2.imdecode(np_arr, cv2.IMREAD_COLOR) # OpenCV >= 3.0:
 
 	# Defining RED range
-	greenLower = (255, 0, 0)         #BLUE  100, 150, 50
-	greenUpper = (190,255,255)       #      140, 255, 255
+	redLower = (160, 100, 100)
+	redUpper = (179, 255, 255)
 
 	blurred = cv2.GaussianBlur(image_np, (11, 11), 0)
 	hsv = cv2.cvtColor(blurred, cv2.COLOR_BGR2HSV)
-	mask = cv2.inRange(hsv, greenLower, greenUpper)
+	mask = cv2.inRange(hsv, redLower, redUpper)
 	mask = cv2.erode(mask, None, iterations=2)
 	mask = cv2.dilate(mask, None, iterations=2)
 	#cv2.imshow('mask', mask)
@@ -76,7 +80,7 @@ class image_feature:
 		c = max(cnts, key=cv2.contourArea)
 		((x, y), radius) = cv2.minEnclosingCircle(c)
 		M = cv2.moments(c)
-		center = (int(M["m10"] / M["m00"]), int(M["m01"] / M["m00"])) # centroid coordinates
+		center = (int(M["m10"] / M["m00"]), int(M["m01"] / M["m00"])) # centroid coordinates		
  
 		# Only proceed if the radius meets a minimum size
 		if radius > 10:
@@ -85,26 +89,35 @@ class image_feature:
 			cv2.circle(image_np, (int(x), int(y)), int(radius),
 				(0, 255, 255), 2)
 			cv2.circle(image_np, center, 5, (0, 0, 255), -1)
+			cv2.circle(image_np, (0,0), 5, (255, 0, 0), -1) # Origin of the image frame
+			cv2.circle(image_np, (0,100), 5, (255, 0, 0), -1) # y-axis of the image frame
+			cv2.circle(image_np, (100,0), 5, (255, 0, 0), -1) # x-axis of the image frame
 
-			# Object Points coordinates (Mattere misure reali pallina)
-			object_point = np.array([[radius , 0., 0.], [0., radius, 0.], [0., -radius, 0.], [0., 0., radius], [0., 0., -radius]])
+			# Object Points coordinates
+			radius_ball = 3.5 # Real radius of the ball
+			object_point = np.array([[radius_ball, 0., 0.], [0., radius_ball, 0.], [0., -radius_ball, 0.], [0., 0., radius_ball], [0., 0., -radius_ball]])
 
 			# Image Points coordinates
 			float_center = np.float32(center)
-			float_center2 = ([float_center[0], float_center[1]+radius])			
-			float_center3 = ([float_center[0], float_center[1]-radius])
-			float_center4 = ([float_center[0]-radius, float_center[1]])
-			float_center5 = ([float_center[0]+radius, float_center[1]])
+			float_center2 = ([float_center[0]+radius, float_center[1]])			
+			float_center3 = ([float_center[0]-radius, float_center[1]])
+			float_center4 = ([float_center[0], float_center[1]-radius])
+			float_center5 = ([float_center[0], float_center[1]+radius])
 			image_point = np.array([float_center, float_center2, float_center3, float_center4, float_center5])
 
 			# Calling solvePnP, it computes T between the object frame and the camera
 			(_, rotation_vector, translation_vector) = cv2.solvePnP(object_point, image_point , self.camera_matrix, self.dist_coefs)
 			
-			# Printing translation vector
-			print '\nTranslation vector: '
-			print translation_vector
+			self.z_vector[self.i] = round(abs(translation_vector[2]))
+			self.i = self.i + 1
 
-			# translation = [float(translation_vector[0]), float(translation_vector[1]), float(translation_vector[2])]
+			if self.i==50:
+				self.i=0
+				self.moda = statistics.mode(self.z_vector)
+
+				# Printing translation vector
+				print 'Mode z: '
+				print self.moda
 
 			# Publishing the translation vector
 			self.translation_pub.publish(float(translation_vector[0]), float(translation_vector[1]), float(translation_vector[2]))

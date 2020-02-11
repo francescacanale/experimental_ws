@@ -2,6 +2,7 @@
 #include "geometry_msgs/Twist.h"
 #include "nav_msgs/Odometry.h"
 #include "gazebo_msgs/ModelStates.h"
+#include "gazebo_msgs/LinkStates.h"
 #include <std_msgs/Int32.h>
 #include <tf/transform_listener.h>
 
@@ -23,8 +24,9 @@ double robot_roll, robot_pitch, robot_yaw;
 float yaw, q, m;
 
 
-float *ball= new float [2]; //Variable to store the ball position
-float *porta= new float [2]; //Variable to store the porta position
+float *ball= new float [2]; //Variable to store the ball initial position
+float *moving_ball= new float [2]; //Variable to store the moving ball position
+float *porta= new float [2]; //Variable to store the porta initial position
 float *robot= new float [2]; //Variable to store the robot position
  
 
@@ -140,7 +142,7 @@ void kick() {
 	//cout<<"\nDistance: ";
 	//cout<<distance;
 
-	if(distance > 0.29 && iannone == false) {
+	if(iannone == false && moving_ball[0] == ball[0] && moving_ball[1] == ball[1]) {
 		cout<<"AVANZO\n";
 		geometry_msgs::Twist vel;
 		vel.linear.x = 1.5;
@@ -209,6 +211,14 @@ void modelCallback(const gazebo_msgs::ModelStates::ConstPtr& msg)
 	q = (porta[0]*ball[1] - ball[0]*porta[1])/(porta[0] - ball[0]); //y coordinates at the origin of the line ball_porta
 	yaw = atan(m); //Yaw angle wrt y axis of the world frame
 }
+
+// Callback for the model of the moving objects
+void linkCallback(const gazebo_msgs::LinkStates::ConstPtr& msg)
+   {
+	//Position of the ball
+    moving_ball[0] = msg->pose[1].position.x;
+    moving_ball[1] = msg->pose[1].position.y;
+}
 	
 
 int main(int argc, char **argv)
@@ -221,7 +231,8 @@ int main(int argc, char **argv)
 
 	//Subscribing to the position topic
 	ros::Subscriber robot_sub = n.subscribe("odom", 1000, odomCallback); //Subcriber to the odometry of the robot
-	ros::Subscriber moodel_sub = n.subscribe("/gazebo/model_states", 1000, modelCallback); //Subcriber to the position of the objects
+	ros::Subscriber moodel_sub = n.subscribe("/gazebo/model_states", 1000, modelCallback); //Subcriber to the initial position of the objects
+	ros::Subscriber link_sub = n.subscribe("/gazebo/link_states", 1000, linkCallback); //Subcriber to the moving position of the objects
 
 	ros::Rate loop_rate(10);
 	ros::spin();
