@@ -43,9 +43,8 @@ class image_feature:
 	self.camera_matrix = np.array([[322.0704122808738, 0., 199.2680620421962], [0., 320.8673986158544, 155.2533082600705], [0., 0., 1.]])
 	self.dist_coefs = np.array([0.1639958233797625, -0.271840030972792, 0.001055841660100477, -0.00166555973740089, 0.])
 
-	self.i=0
-	self.moda=0
-	self.z_vector=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	# Camera-Object parameters
+	self.T_matrix = [[0., 0., 0., 0.], [0., 0., 0., 0.], [0., 0., 0., 0.]]
 
     def callback(self, ros_data):
         '''Callback function of subscribed topic. 
@@ -89,9 +88,6 @@ class image_feature:
 			cv2.circle(image_np, (int(x), int(y)), int(radius),
 				(0, 255, 255), 2)
 			cv2.circle(image_np, center, 5, (0, 0, 255), -1)
-			cv2.circle(image_np, (0,0), 5, (255, 0, 0), -1) # Origin of the image frame
-			cv2.circle(image_np, (0,100), 5, (255, 0, 0), -1) # y-axis of the image frame
-			cv2.circle(image_np, (100,0), 5, (255, 0, 0), -1) # x-axis of the image frame
 
 			# Object Points coordinates
 			radius_ball = 3.5 # Real radius of the ball
@@ -104,20 +100,27 @@ class image_feature:
 			float_center4 = ([float_center[0], float_center[1]-radius])
 			float_center5 = ([float_center[0], float_center[1]+radius])
 			image_point = np.array([float_center, float_center2, float_center3, float_center4, float_center5])
+			#print float_center
+			#print float_center2
+			#print float_center3
+			#print float_center4
+			#print float_center5
 
 			# Calling solvePnP, it computes T between the object frame and the camera
 			(_, rotation_vector, translation_vector) = cv2.solvePnP(object_point, image_point , self.camera_matrix, self.dist_coefs)
 			
-			self.z_vector[self.i] = round(abs(translation_vector[2]))
-			self.i = self.i + 1
+			(rotation_matrix, _) = cv2.Rodrigues(rotation_vector)
+			self.T_matrix = np.concatenate((rotation_matrix, translation_vector), axis=1)
 
-			if self.i==50:
-				self.i=0
-				self.moda = statistics.mode(self.z_vector)
+			multiplication = np.dot(self.camera_matrix, self.T_matrix)
 
-				# Printing translation vector
-				print 'Mode z: '
-				print self.moda
+			object_in_image = np.array([[center[0]], [center[1]], [1]])
+			object_position = np.dot(np.linalg.pinv(multiplication), object_in_image)
+			object_position = object_position / object_position[3]
+
+			# Printing translation vector
+			print 'Object position: '
+			print object_position
 
 			# Publishing the translation vector
 			self.translation_pub.publish(float(translation_vector[0]), float(translation_vector[1]), float(translation_vector[2]))
