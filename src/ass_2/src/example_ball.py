@@ -31,9 +31,6 @@ class image_feature:
 	# Topic where we publish the translation vector
 	self.translation_pub = rospy.Publisher("translation", Translation, queue_size=10) 
 
-        # Topic where we publish
-        self.image_pub = rospy.Publisher("/output/image_raw/compressed", CompressedImage, queue_size=1)
-
         # Subscribed Topic
         self.subscriber = rospy.Subscriber("/raspicam_node/image/compressed", CompressedImage, self.callback,  queue_size = 1)
         if VERBOSE :
@@ -43,8 +40,12 @@ class image_feature:
 	self.camera_matrix = np.array([[322.0704122808738, 0., 199.2680620421962], [0., 320.8673986158544, 155.2533082600705], [0., 0., 1.]])
 	self.dist_coefs = np.array([0.1639958233797625, -0.271840030972792, 0.001055841660100477, -0.00166555973740089, 0.])
 
-	# Camera-Object parameters
-	self.T_matrix = [[0., 0., 0., 0.], [0., 0., 0., 0.], [0., 0., 0., 0.]]
+	# Transformation matrix between camera and ball
+	self.T_matrix = [[0., 0., 0., 0.], [0., 0., 0., 0.], [0., 0., 0., 0.]] # Init
+
+	# Object Points coordinates
+	radius_ball = 3.5 # Real radius of the ball
+	self.object_point = np.array([[0., 0., -radius_ball], [radius_ball, 0., 0.], [-radius_ball, 0., 0.], [0., -radius_ball, 0.], [0., radius_ball, 0.]])
 
     def callback(self, ros_data):
         '''Callback function of subscribed topic. 
@@ -54,7 +55,7 @@ class image_feature:
 
         #### direct conversion to CV2 ####
         np_arr = np.fromstring(ros_data.data, np.uint8)
-        image_np = cv2.imdecode(np_arr, cv2.IMREAD_COLOR) # OpenCV >= 3.0:
+        image_np = cv2.imdecode(np_arr, cv2.IMREAD_COLOR)
 
 	# Defining RED range
 	redLower = (160, 100, 100)
@@ -65,7 +66,6 @@ class image_feature:
 	mask = cv2.inRange(hsv, redLower, redUpper)
 	mask = cv2.erode(mask, None, iterations=2)
 	mask = cv2.dilate(mask, None, iterations=2)
-	#cv2.imshow('mask', mask)
 	cnts = cv2.findContours(mask.copy(), cv2.RETR_EXTERNAL,
 		cv2.CHAIN_APPROX_SIMPLE)
 	cnts = imutils.grab_contours(cnts)
@@ -89,10 +89,6 @@ class image_feature:
 				(0, 255, 255), 2)
 			cv2.circle(image_np, center, 5, (0, 0, 255), -1)
 
-			# Object Points coordinates
-			radius_ball = 3.5 # Real radius of the ball
-			object_point = np.array([[radius_ball, 0., 0.], [0., radius_ball, 0.], [0., -radius_ball, 0.], [0., 0., radius_ball], [0., 0., -radius_ball]])
-
 			# Image Points coordinates
 			float_center = np.float32(center)
 			float_center2 = ([float_center[0]+radius, float_center[1]])			
@@ -106,11 +102,11 @@ class image_feature:
 			#print float_center4
 			#print float_center5
 
-			# Calling solvePnP, it computes T between the object frame and the camera
-			(_, rotation_vector, translation_vector) = cv2.solvePnP(object_point, image_point , self.camera_matrix, self.dist_coefs)
+			# Calling solvePnP, it computes T-matrix between the object frame and the camera
+			(_, rotation_vector, translation_vector) = cv2.solvePnP(self.object_point, image_point , self.camera_matrix, self.dist_coefs)
 			
 			(rotation_matrix, _) = cv2.Rodrigues(rotation_vector)
-			self.T_matrix = np.concatenate((rotation_matrix, translation_vector), axis=1)
+			self.T_matrix = np.concatenate((np.identity(3), translation_vector), axis=1)
 
 			multiplication = np.dot(self.camera_matrix, self.T_matrix)
 
@@ -120,18 +116,15 @@ class image_feature:
 
 			# Printing translation vector
 			print 'Object position: '
-			print object_position
+			print abs(object_position)
 
 			# Publishing the translation vector
 			self.translation_pub.publish(float(translation_vector[0]), float(translation_vector[1]), float(translation_vector[2]))
  
 	# update the points queue
-	#pts.appendleft(center)
         cv2.imshow('window', image_np)
         cv2.waitKey(2)
 
-     
-        #self.subscriber.unregister()
 
 def main(args):
     '''Initializes and cleanup ros node'''

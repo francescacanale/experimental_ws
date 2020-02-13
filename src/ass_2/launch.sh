@@ -13,6 +13,6 @@ echo $ROS_HOSTNAME
 
 
 echo "setting ROS_MASTER_URI to:"
-CORE_URI="http://172.20.10.3:11311"
+CORE_URI="http://130.251.13.162:11311"
 export ROS_MASTER_URI=$CORE_URI
 echo $ROS_MASTER_URI
