@@ -18,14 +18,24 @@
 #define encoderB2 31
 #define encoderA3 34
 #define encoderB3 35
+#define LOOPTIME 100
 
 int stateA = 0;
 int stateB = 0;
-int counter = -1;
+int counter = 0;
 unsigned long t_start;
-int vel = 0;
-int sw = 0;
-double actvel = 0;
+double vel=0;
+String sw="";
+double actvel=0;
+int countAnt=0;
+int PWM_val = 0; 
+unsigned long lastMilli = 0;                    // loop timing 
+unsigned long lastMilliPrint = 0;               // loop timing
+double speed_req = 0.0;                            // speed (Set Point)
+double speed_act = 0.0;                              // speed (actual value)
+double Kp =   16.0;                                // PID proportional control Gain
+double Kd =    4.0;                                // PID Derivitave control gain
+double last_error=0.0;
 
 void setup() {
   Serial.begin(115200);           // set up Serial library at 115200 bps
@@ -41,6 +51,8 @@ void setup() {
   //define encoder 1: ANT-SN
   pinMode(encoderA0, INPUT);
   pinMode(encoderB0, INPUT);
+  attachInterrupt(digitalPinToInterrupt(encoderA0), checkA0, CHANGE);
+  attachInterrupt(digitalPinToInterrupt(encoderB0), checkB0, CHANGE);
 
   //define motor 2: ANT-DX
   pinMode(enA1, OUTPUT);
@@ -62,6 +74,8 @@ void setup() {
   //define encoder 4: POST-DX
   pinMode(encoderA3, INPUT);
   pinMode(encoderB3, INPUT);
+  
+  Serial.println("Arduino is ready");
 
   //After a call to analogWrite(),
   //the pin will generate a steady rectangular wave of the specified duty cycle until the next call to analogWrite()
@@ -94,8 +108,6 @@ void loop() {
   static int speed[4];
   static char buff[30];
   int counter = 0;
-  Serial.print("Hello");
-
   // read command from raspberry pi
   while (Serial.available()) {
     buff[counter] = Serial.read();
@@ -117,19 +129,45 @@ void loop() {
   control_motor(speed[2], motorPin2, enA2, enB2);
   control_motor(speed[3], motorPin3, enA3, enB3);
 
-  Serial.print(speed[0]); Serial.print(",");
+/*  Serial.print(speed[0]); Serial.print(",");
   Serial.print(speed[1]); Serial.print(",");
   Serial.print(speed[2]); Serial.print(",");
-  Serial.print(speed[3]); Serial.print(",");
+  Serial.println(speed[3]);*/
 
+  
+  if((millis()-lastMilli) >= LOOPTIME)   { 
+       lastMilli = millis();
+       speed_act = (double)(((double)(counter - countAnt)*(1000.0/(double)LOOPTIME))/(double)(320.0)); 
+       countAnt=counter;
+       PWM_val= updatePid(PWM_val, speed_req, speed_act);                        // compute PWM value
+       analogWrite(motorPin0, PWM_val);  
+  }
+  printMotorInfo();
   delay(100);
 }
+
+void printMotorInfo()  {                                                      // display data
+ if((millis()-lastMilliPrint) >= 500) {                     
+   lastMilliPrint = millis();
+   Serial.print("< RPM:");          Serial.print(speed_act);         Serial.print("  PWM:");  Serial.print(PWM_val);   Serial.print(" > \n");          
+ }
+}
+
+int updatePid(int command, double targetValue, double currentValue)   {             // compute PWM value
+  double pidTerm = 0.0;                                                            // PID correction
+  double error=0.0;                                                               
+  error = (double) (fabs(targetValue) - fabs(currentValue)); 
+  pidTerm = (Kp * error) + (Kd * (error - last_error));                          
+  last_error = error;
+  return constrain(command + int(pidTerm), 0, 255);
+}
+
 
 void checkA0() {
   int count;
   stateB = digitalRead(encoderB0);
   stateA = digitalRead(encoderA0);
-  if (stateA != stateB) {
+  if (stateA == stateB) {
     counter++;
     count = 100;
   }
