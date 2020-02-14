@@ -9,7 +9,6 @@ import numpy as np
 from scipy.ndimage import filters
 
 import imutils
-import statistics
 
 # OpenCV
 import cv2
@@ -40,12 +39,12 @@ class image_feature:
 	self.camera_matrix = np.array([[322.0704122808738, 0., 199.2680620421962], [0., 320.8673986158544, 155.2533082600705], [0., 0., 1.]])
 	self.dist_coefs = np.array([0.1639958233797625, -0.271840030972792, 0.001055841660100477, -0.00166555973740089, 0.])
 
-	# Transformation matrix between camera and ball
-	self.T_matrix = [[0., 0., 0., 0.], [0., 0., 0., 0.], [0., 0., 0., 0.]] # Init
+	# Initialization of the Transformation matrix between camera and ball
+	self.T_matrix = [[0., 0., 0., 0.], [0., 0., 0., 0.], [0., 0., 0., 0.]]
 
 	# Object Points coordinates
-	radius_ball = 3.5 # Real radius of the ball
-	self.object_point = np.array([[0., 0., -radius_ball], [radius_ball, 0., 0.], [-radius_ball, 0., 0.], [0., -radius_ball, 0.], [0., radius_ball, 0.]])
+	radius_ball = 3.5 # Real radius of the ball (cm)
+	self.object_point = np.array([[radius_ball, 0., 0.], [-radius_ball, 0., 0.], [0., -radius_ball, 0.], [0., radius_ball, 0.]])
 
     def callback(self, ros_data):
         '''Callback function of subscribed topic. 
@@ -91,32 +90,18 @@ class image_feature:
 
 			# Image Points coordinates
 			float_center = np.float32(center)
-			float_center2 = ([float_center[0]+radius, float_center[1]])			
-			float_center3 = ([float_center[0]-radius, float_center[1]])
-			float_center4 = ([float_center[0], float_center[1]-radius])
-			float_center5 = ([float_center[0], float_center[1]+radius])
-			image_point = np.array([float_center, float_center2, float_center3, float_center4, float_center5])
-			#print float_center
-			#print float_center2
-			#print float_center3
-			#print float_center4
-			#print float_center5
+			float_center1 = ([float_center[0]+radius, float_center[1]])			
+			float_center2 = ([float_center[0]-radius, float_center[1]])
+			float_center3 = ([float_center[0], float_center[1]-radius])
+			float_center4 = ([float_center[0], float_center[1]+radius])
+			image_point = np.array([float_center1, float_center2, float_center3, float_center4])
 
-			# Calling solvePnP, it computes T-matrix between the object frame and the camera
+			# Calling solvePnP to compute T-matrix between the object frame and the camera
 			(_, rotation_vector, translation_vector) = cv2.solvePnP(self.object_point, image_point , self.camera_matrix, self.dist_coefs)
-			
-			(rotation_matrix, _) = cv2.Rodrigues(rotation_vector)
-			self.T_matrix = np.concatenate((np.identity(3), translation_vector), axis=1)
-
-			multiplication = np.dot(self.camera_matrix, self.T_matrix)
-
-			object_in_image = np.array([[center[0]], [center[1]], [1]])
-			object_position = np.dot(np.linalg.pinv(multiplication), object_in_image)
-			object_position = object_position / object_position[3]
 
 			# Printing translation vector
 			print 'Object position: '
-			print abs(object_position)
+			print translation_vector
 
 			# Publishing the translation vector
 			self.translation_pub.publish(float(translation_vector[0]), float(translation_vector[1]), float(translation_vector[2]))
