@@ -74,7 +74,7 @@ void setup() {
   //define encoder 4: POST-DX
   pinMode(encoderA3, INPUT);
   pinMode(encoderB3, INPUT);
-  
+
   Serial.println("Arduino is ready");
 
   //After a call to analogWrite(),
@@ -129,28 +129,35 @@ void loop() {
   control_motor(speed[2], motorPin2, enA2, enB2);
   control_motor(speed[3], motorPin3, enA3, enB3);
 
-/*  Serial.print(speed[0]); Serial.print(",");
-  Serial.print(speed[1]); Serial.print(",");
-  Serial.print(speed[2]); Serial.print(",");
-  Serial.println(speed[3]);*/
+  /*  Serial.print(speed[0]); Serial.print(",");
+   Serial.print(speed[1]); Serial.print(",");
+   Serial.print(speed[2]); Serial.print(",");
+   Serial.println(speed[3]);*/
 
-  
+
   if((millis()-lastMilli) >= LOOPTIME)   { 
-       lastMilli = millis();
-       speed_act = (double)(((double)(counter - countAnt)*(1000.0/(double)LOOPTIME))/(double)(320.0)); 
-       countAnt=counter;
-       PWM_val= updatePid(PWM_val, speed_req, speed_act);                        // compute PWM value
-       analogWrite(motorPin0, PWM_val);  
+    lastMilli = millis();
+    speed_act = (double)(((double)(counter - countAnt)*(1000.0/(double)LOOPTIME))/(double)(320.0)); 
+    countAnt=counter;
+    PWM_val= updatePid(PWM_val, speed_req, speed_act);                        // compute PWM value
+    /*analogWrite(motorPin0, PWM_val);  
+    analogWrite(motorPin0, PWM_val);  
+    analogWrite(motorPin0, PWM_val);  
+    analogWrite(motorPin0, PWM_val);  */
   }
   printMotorInfo();
   delay(100);
 }
 
 void printMotorInfo()  {                                                      // display data
- if((millis()-lastMilliPrint) >= 500) {                     
-   lastMilliPrint = millis();
-   Serial.print("< RPM:");          Serial.print(speed_act);         Serial.print("  PWM:");  Serial.print(PWM_val);   Serial.print(" > \n");          
- }
+  if((millis()-lastMilliPrint) >= 500) {                     
+    lastMilliPrint = millis();
+    Serial.print("< RPM:");          
+    Serial.print(speed_act);         
+    Serial.print("  PWM:");  
+    Serial.print(PWM_val);   
+    Serial.print(" > \n");          
+  }
 }
 
 int updatePid(int command, double targetValue, double currentValue)   {             // compute PWM value
@@ -181,7 +188,7 @@ void checkA0() {
     actvel = count / double(delta);
     t_start = millis();
   }
-  }
+}
 
 void checkB0() {
   int count;
@@ -201,7 +208,7 @@ void checkB0() {
     actvel = count / double(delta);
     t_start = millis();
   }
-  }
+}
 
 void checkA1() {
   int count;
@@ -221,7 +228,7 @@ void checkA1() {
     actvel = count / double(delta);
     t_start = millis();
   }
-  }
+}
 
 void checkB1() {
   int count;
@@ -241,7 +248,7 @@ void checkB1() {
     actvel = count / double(delta);
     t_start = millis();
   }
-  }
+}
 
 void checkA2() {
   int count;
@@ -261,7 +268,7 @@ void checkA2() {
     actvel = count / double(delta);
     t_start = millis();
   }
-  }
+}
 
 void checkB2() {
   int count;
@@ -281,7 +288,7 @@ void checkB2() {
     actvel = count / double(delta);
     t_start = millis();
   }
-  }
+}
 
 void checkA3() {
   int count;
@@ -301,7 +308,7 @@ void checkA3() {
     actvel = count / double(delta);
     t_start = millis();
   }
-  }
+}
 
 void checkB3() {
   int count;
@@ -321,4 +328,5 @@ void checkB3() {
     actvel = count / double(delta);
     t_start = millis();
   }
-  }
+}
+

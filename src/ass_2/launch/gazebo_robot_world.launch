@@ -7,7 +7,7 @@
     <arg name="paused" value="true"/>
   </include>
 
-  <!-- defining the position of the robot -->
+  <!-- defining the initial position of the robot -->
   <arg name="model" default="$(find ass_2)/urdf/robot.xacro" />
   <arg name="x" default="2"/>
   <arg name="y" default="4"/>
