@@ -11,12 +11,13 @@ Our code architecture can be summarized in three tasks described in the followin
 
 ## THE ROBOT
 The robot was built using a kit that contains:
-- Arduino (dire modello)
-- Raspberry (dire modello)
-- Camera (dire modello)
-- 4 omni-directional wheels
-- .....
-
+- [Arduino Due](https://www.arduino.cc/en/Guide/ArduinoDue)
+- [Raspberry Pi 3 model A+](https://www.raspberrypi.org/products/raspberry-pi-3-model-a-plus/)
+- [Camera Module V2](https://www.raspberrypi.org/products/camera-module-v2/)
+- [Kit 4WD omni-directional wheels](https://www.amazon.it/OSOYOO-Robotico-Platform-velocit%C3%A0-Raspberry/dp/B07XRFQN8D/ref=sr_1_5?__mk_it_IT=%C3%85M%C3%85%C5%BD%C3%95%C3%91&crid=M5QEL3ZWUSSR&keywords=osoyoo+arduino+robot&qid=1581868004&sprefix=osoyoo%2Caps%2C183&sr=8-5)
+Additional part:
+- [RPi UPS PowerPack](https://www.amazon.it/UNIROI-Espansione-Raspberry-Ufficiale-Aggiornata/dp/B07KWTS638/ref=sr_1_2?__mk_it_IT=%C3%85M%C3%85%C5%BD%C3%95%C3%91&keywords=rasp+powerpack&qid=1581868110&sr=8-2)
+- [8 x AA battery Holder](https://www.amazon.it/interruttore-Arduinos-solenoidi-coperchio-resistente/dp/B07BY3ZDDL/ref=sr_1_7?__mk_it_IT=%C3%85M%C3%85%C5%BD%C3%95%C3%91&keywords=pack+8+pile+stilo&qid=1581868190&sr=8-7) (Not suggested)
 ## GETTING STARTED
 ### Download the .zip file correspondent to the workspace in the user home folder, then unzip the package folder and access it:
 ```
@@ -33,8 +34,8 @@ $ source devel/setup.bash
 $ catkin_make
 ```
 ### Prepare your RaspberryPi
-DIRE DI INSTALLARE ROS + OPENCV
-METTERE LINK A SITO CHE ABBIAMO USATO PER FARE TUTTO (FLASHARE, METTERE WIFI...)
+How to start with the Raspberry Pi [Headless Raspberry Pi 3 B+ SSH WiFi Setup - Guide](https://desertbot.io/blog/headless-raspberry-pi-3-bplus-ssh-wifi-setup).
+How to install ROS on the Raspberry Pi [Installing ROS Kinetic on the Raspberry Pi](http://wiki.ros.org/ROSberryPi/Installing%20ROS%20Kinetic%20on%20the%20Raspberry%20Pi)
 
 ### Link between PC and RaspberryPi:
 Enter in the raspberry via ssh.
@@ -63,7 +64,7 @@ Export the ROS_IP and the MASTER_URI
 $ export ROS_IP=<localhost of PC>
 ```
 ```
-$ export ROS_MASTER_URI=http://<localhost of RaspPI>:11311
+$ export ROS_MASTER_URI=http://<localhost of RaspPi>:11311
 ```
 Do this every time you open a new terminal on your PC, to link it to RaspPI roscore.
 
@@ -95,7 +96,7 @@ and run the simulation.
 
 You can easly change the starting position/orientation of the robot by changing it in the [Launch file](https://github.com/francescacanale/experimental_ws/blob/master/src/ass_2/launch/gazebo_robot_world.launch).
 
-You can also change the starting position of the ball and the goal by changing it in the [Gazebo World file] (https://github.com/francescacanale/experimental_ws/blob/master/src/crestino_gazebo/worlds/crestino.world)
+You can also change the starting position of the ball and the goal by changing it in the [Gazebo World file](https://github.com/francescacanale/experimental_ws/blob/master/src/crestino_gazebo/worlds/crestino.world)
 
 ## TASK 3: MAKE THE REAL ROBOT MOVE
 With roscore active on RaspPi, open a new RaspPi terminal and go inside catkin workspace:
