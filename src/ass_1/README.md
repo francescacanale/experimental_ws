@@ -1,7 +1,7 @@
 # First Assignment - Node Counting Algorithm in Gazebo
 
 ## GOAL OF THE ASSIGNMENT
-### The goal is to make the robots exploring the map until all the nodes are visited at least once.
+### The goal is to make 4 robots exploring a map until all the nodes are visited at least once.
 
 ## GETTING STARTED
 ### Download the .zip file correspondent to the workspace in the user home folder, then unzip the package folder and access it:

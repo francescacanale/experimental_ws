@@ -4,7 +4,10 @@
 ### The goal is to build a omnidirectinal wheeled robot that should be able to detect a red ball and push it towards a goal.
 
 ## CODE ARCHITECTURE
-Our code architecture can be summarized in three tasks described in the following picture ![Picture](ExRob Diagram.png)
+Our code architecture can be summarized in three tasks described in the following picture:
+<p align="center">
+ <img src="ExRob Diagram.png"/>
+</p>
 
 ## THE ROBOT
 The robot was built using a kit that contains:
@@ -35,6 +38,7 @@ METTERE LINK A SITO CHE ABBIAMO USATO PER FARE TUTTO (FLASHARE, METTERE WIFI...)
 
 ### Link between PC and RaspberryPi:
 Enter in the raspberry via ssh.
+
 Be sure you are under the same Network of RaspPi.
 ```
 $ ssh-keygen -R raspberrypi.local
@@ -44,6 +48,7 @@ $ ssh pi@raspberrypi.local
 ```
 
 Enter the password (default psw "raspberry") and you are inside RaspPi.
+
 Once you are inside export the ROS_IP:
 ```
 $ export ROS_IP=<localhost of RaspPi>
@@ -63,12 +68,13 @@ $ export ROS_MASTER_URI=http://<localhost of RaspPI>:11311
 Do this every time you open a new terminal on your PC, to link it to RaspPI roscore.
 
 ## TASK 1: RED BALL DETECTION
-In RaspberryPi (with the roscore already launched)
+In RaspberryPi (with the roscore already launched):
 ```
 $ roslaunch raspicam_node camerav2_410x308_10fps.launch
 ```
 
 From your PC launch [Ball Detection Code](https://github.com/francescacanale/experimental_ws/blob/master/src/ass_2/src/ball_detection.py):
+
 Go to the folder in which is present the python file:
 ```
 $ cd experimental_ws/src/ass_2/src
@@ -86,7 +92,9 @@ $ cd experimental_ws
 $ roslaunch ass_2 gazebo_robot_world.launch
 ```
 and run the simulation.
+
 You can easly change the starting position/orientation of the robot by changing it in the [Launch file](https://github.com/francescacanale/experimental_ws/blob/master/src/ass_2/launch/gazebo_robot_world.launch).
+
 You can also change the starting position of the ball and the goal by changing it in the [Gazebo World file] (https://github.com/francescacanale/experimental_ws/blob/master/src/crestino_gazebo/worlds/crestino.world)
 
 ## TASK 3: MAKE THE REAL ROBOT MOVE
