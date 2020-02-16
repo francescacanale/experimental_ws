@@ -25,246 +25,253 @@ bool behindBall = false;
 bool onTrajectory = false;
 bool kicked = false;
 
-double robot_roll, robot_pitch, robot_yaw;
 float yaw, q, m;
-geometry_msgs::Twist tmp; // Temporary variable for comparing
-int sign_v = 0;			  // Sign of the velocities
+geometry_msgs::Twist tmp; 					// Temporary variable for comparing cmd_vel messages
+int sign_v = 0;			  					// Sign of the velocities
 
-float *ball = new float[2];		   // Variable to store the ball initial position
-float *moving_ball = new float[2]; // Variable to store the moving ball position
-float *porta = new float[2];	   // Variable to store the porta initial position
-float *robot = new float[2];	   // Variable to store the robot position
+float *ball = new float[2];					// Variable to store the ball initial position
+float *moving_ball = new float[2];			// Variable to store the moving ball position
+float *porta = new float[2];				// Variable to store the porta initial position
+float *robot = new float[2];				// Variable to store the robot position
+double robot_roll, robot_pitch, robot_yaw;	// Variables to store the robot orientation
+
 
 // Function to decide which velocities give to the robot
-bool controlVelocities(geometry_msgs::Twist vel)
-{
+bool controlVelocities(geometry_msgs::Twist vel) {
 
-	if (vel.linear.x == tmp.linear.x && vel.linear.y == tmp.linear.y && vel.angular.z == tmp.angular.z)
-	{
+	// The velocity is given to the robot only if it is different form the prevoius given velocity
+	if (vel.linear.x == tmp.linear.x && vel.linear.y == tmp.linear.y && vel.angular.z == tmp.angular.z) {
 		return false;
 	}
-	else
-	{
+	else {
 		tmp = vel;
 		return true;
 	}
 }
 
-// Function to align the robot
-void alignment(float yaw, double robot_yaw)
-{
-	//We use this to avoid some problem with the first command during the initialization
-	if (start)
-	{
+
+// Function to align the robot on the line ball-porta
+void alignment(float yaw, double robot_yaw) {
+
+	//We use this to avoid some problem with the first velocity command during the initialization
+	if (start) {
+		start = false;
 		cout << "START\n";
 		geometry_msgs::Twist vel;
 		vel.linear.x = 0.3;
-		start = false;
 		pub_robot.publish(vel);
 	}
 
 	// Misalignment between the orientation of the robot and the line ball-porta
 	float misalignment = yaw - robot_yaw;
+
 	// Understand the fastest way to align
-	if (robot_yaw > yaw + 0.05 && robot_yaw < yaw + M_PI - 0.05 && abs(misalignment) > 0.05)
-	{
-		cout << "CLOCKWISE\n"; // Moving Clockwise to orient the robot
+	if (robot_yaw > yaw + 0.05 && robot_yaw < yaw + M_PI - 0.05 && abs(misalignment) > 0.05) {
+		cout << "CLOCKWISE\n"; 										// Moving the robot clockwise
 		geometry_msgs::Twist vel;
-		vel.angular.z = -0.3 * misalignment / abs(misalignment); // Giving an angular velocity on z axis
-		pub.publish(vel);										 // Publishing the velocity
+		vel.angular.z = -0.3 * misalignment / abs(misalignment);	// Giving an angular velocity on z axis
+		pub.publish(vel);											// Publishing the velocity
 		if (controlVelocities(vel))
 			pub_robot.publish(vel);
 	}
-	else if ((robot_yaw > yaw + M_PI + 0.05 || robot_yaw < yaw - 0.05) && abs(misalignment) > 0.05)
-	{
-		cout << "ANTICLOCKWISE\n"; // Moving Anti-Clockwise to orient the robot
+	else if ((robot_yaw > yaw + M_PI + 0.05 || robot_yaw < yaw - 0.05) && abs(misalignment) > 0.05) {
+		cout << "ANTICLOCKWISE\n";									// Moving the robot anti-clockwise
 		geometry_msgs::Twist vel;
-		vel.angular.z = +0.3 * misalignment / abs(misalignment); // Giving an angular velocity on z axis
-		pub.publish(vel);										 // Publishing the velocity
+		vel.angular.z = +0.3 * misalignment / abs(misalignment);	// Giving an angular velocity on z axis
+		pub.publish(vel);											// Publishing the velocity
 		if (controlVelocities(vel))
 			pub_robot.publish(vel);
 	}
-	else
-	{
-		aligned = true; // Already aligned
+	else {
+		aligned = true;			// Now the robot is aligned on the ine ball-porta
 		cout << "Aligned\n";
 		geometry_msgs::Twist vel;
-		vel.angular.z = 0;
-		pub.publish(vel);
+		vel.angular.z = 0;		// Giving a zero angular velocity on z axis
+		pub.publish(vel); 		// Publishing the velocity
 		if (controlVelocities(vel))
 			pub_robot.publish(vel);
 	}
 }
 
+
 // Function to move the robot back if it is not behind the ball
-void moveBack()
-{
+void moveBack() {
 
 	float p = -m * robot[0] + robot[1];						 // y coordinate at the origin of the line of the aligned robot
 	float distance_rette = abs(p - q) / sqrt(pow(m, 2) + 1); // Distance btw two parallel lines
 	float y_robot_new;										 // y coordinate that the robot will have after the translation
 
-	// Case 1: P>Q
-	if (p > q)
-	{
-		if (m > 0)
-		{
+	// Case 1: Parallel vertical lines
+	if (abs(q) > 100) {
+		y_robot_new = robot[1];				// If the lines are vertical the y of the robot remains the same
+		if (ball[1] < y_robot_new + 1) { 	// If the robot after the translation will not be behind the ball
+			cout << "MOVING BACK\n";        // Moving the robot back
+			geometry_msgs::Twist vel;
+			vel.linear.x = -0.2;			// Giving a linear velocity on x axis
+			pub.publish(vel);				// Publishing the velocity
+			if (controlVelocities(vel))
+				pub_robot.publish(vel);
+		}
+		else {
+			behindBall = true;				// The robot is now behind the ball
+			cout << "Behind the ball\n";
+		}
+	}
+	// Case 2: P>Q
+	else if (p > q) {
+		if (m > 0) {
 			y_robot_new = robot[1] - abs(distance_rette * sin(M_PI / 2 - m));
 			sign_v = -1;
 		}
-		else
-		{
+		else {
 			y_robot_new = robot[1] - abs(distance_rette * sin(m - M_PI / 2));
 			sign_v = 1;
 		}
-		if (ball[1] < y_robot_new + 1)
-		{
-			cout << "BACK\n";
+		if (ball[1] < y_robot_new + 1) { 	// If the robot after the translation will not be behind the ball
+			cout << "MOVING BACK\n";        // Moving the robot back
 			geometry_msgs::Twist vel;
-			vel.linear.x = -0.2;
-			pub.publish(vel);
+			vel.linear.x = -0.2;			// Giving a linear velocity on x axis
+			pub.publish(vel);				// Publishing the velocity
 			if (controlVelocities(vel))
 				pub_robot.publish(vel);
 		}
-		else
-		{
-			behindBall = true;
+		else {
+			behindBall = true;				// The robot is now behind the ball
+			cout << "Behind the ball\n";
 		}
 	}
-	// Case 2: P<Q
-	else
-	{
-		if (m > 0)
-		{
+	// Case 3: P<Q
+	else {
+		if (m > 0) {
 			y_robot_new = robot[1] + abs(distance_rette * sin(M_PI / 2 - m));
 			sign_v = 1;
 		}
-		else
-		{
+		else {
 			y_robot_new = robot[1] + abs(distance_rette * sin(m - M_PI / 2));
 			sign_v = -1;
 		}
-		if (ball[1] < y_robot_new + 1)
-		{
-			cout << "BACK\n";
+		if (ball[1] < y_robot_new + 1) {	// If the robot after the translation will not be behind the ball
+			cout << "MOVING BACK\n";        // Moving the robot back
 			geometry_msgs::Twist vel;
-			vel.linear.x = -0.2;
-			pub.publish(vel);
+			vel.linear.x = -0.2;			// Giving a linear velocity on x axis
+			pub.publish(vel);				// Publishing the velocity
 			if (controlVelocities(vel))
 				pub_robot.publish(vel);
 		}
-		else
-		{
-			behindBall = true;
+		else {
+			behindBall = true;				// The robot is now behind the ball
+			cout << "Behind the ball\n";
 		}
 	}
 }
 
-// Function to move the robot to the trajectory ball-porta
-void moveToTrajectory()
-{
 
-	float p = -m * robot[0] + robot[1];						 // y coordinate at the origin of the line of the aligned robot
-	float distance_rette = abs(p - q) / sqrt(pow(m, 2) + 1); // Distance btw to parallel lines
+// Function to move the robot on the trajectory ball-porta
+void moveToTrajectory() {
 
-	if (abs(distance_rette) > 0.1)
-	{
-		cout << "TRASLATION\n";
+	float p = -m * robot[0] + robot[1];							// y coordinate at the origin of the line of the aligned robot
+	float distance_rette = abs(p - q) / sqrt(pow(m, 2) + 1);	// Distance btw to parallel lines
+	float distance_rette_vertical = robot[0] - ball[0];			// Distance btw two parallel lines, vertical case
+
+	
+	if (abs(q) > 100 && abs(distance_rette_vertical) > 0.1) { 							// Particular case of vertical lines
+		cout << "TRASLATION\n";															// Moving the robot on the trajectory ball-porta
 		geometry_msgs::Twist vel;
-		vel.linear.y = 0.2 * sign_v;
-		pub.publish(vel);
+		vel.linear.y = 0.2 * distance_rette_vertical / abs(distance_rette_vertical); 	// Giving a linear velocity on y axis
+		pub.publish(vel);																// Publishing the velocity
+		if (controlVelocities(vel))
+			pub_robot.publish(vel);
+
+	}
+	else if (abs(distance_rette) > 0.1) {	// Normal case of oblique lines
+		cout << "TRASLATION\n";				// Moving the robot on the trajectory ball-porta
+		geometry_msgs::Twist vel;
+		vel.linear.y = 0.2 * sign_v;		// Giving a linear velocity on y axis
+		pub.publish(vel);					// Publishing the velocity
 		if (controlVelocities(vel))
 			pub_robot.publish(vel);
 	}
-	else
-	{
-		cout << "I've traslated\n";
-		onTrajectory = true;
+	else {
+		onTrajectory = true;		// The robot is now on the trajectory ball-porta
+		cout << "I've traslated\n";						
 		geometry_msgs::Twist vel;
-		vel.linear.x = 0;
-		vel.linear.y = 0;
-		pub.publish(vel);
+		vel.linear.y = 0;			// Giving a zero linear velocity on y axis
+		pub.publish(vel);			// Publishing the velocity
 		if (controlVelocities(vel))
 			pub_robot.publish(vel);
 	}
 }
+
 
 // Function to kick the ball
-void kick()
-{
+void kick() {
 
-	if (moving_ball[0] == ball[0] && moving_ball[1] == ball[1])
-	{
-		cout << "GO FORWARD\n";
+	if (moving_ball[0] == ball[0] && moving_ball[1] == ball[1]) {	// If the ball is still
+		cout << "GO FORWARD\n";										// Moving the robot foward to kick the ball
 		geometry_msgs::Twist vel;
-		vel.linear.x = 0.3;
-		pub.publish(vel);
+		vel.linear.x = 0.3;											// Giving a linear velocity on x axis
+		pub.publish(vel);											// Publishing the velocity
 		if (controlVelocities(vel))
 			pub_robot.publish(vel);
 	}
-	else
-	{
+	else {
+		kicked = true;				// The robot has kicked the ball
 		cout << "Kick!\n";
-		kicked = true;
 		geometry_msgs::Twist vel;
-		vel.linear.x = 0;
-		vel.linear.y = 0;
-		pub.publish(vel);
+		vel.linear.x = 0;			// Giving a zero linear velocity on x axis
+		pub.publish(vel);			// Publishing the velocity
 		if (controlVelocities(vel))
 			pub_robot.publish(vel);
 	}
 }
+
 
 // Callback for the odometry of the robot
 void odomCallback(const nav_msgs::Odometry::ConstPtr &msg)
 {
-	// Computing pose robot
+	// Computing pose of the robot
 	robot[0] = msg->pose.pose.position.x;
 	robot[1] = msg->pose.pose.position.y;
 
-	// Computing orientation robot
+	// Computing orientation of the robot
 	tf::Quaternion t(msg->pose.pose.orientation.x, msg->pose.pose.orientation.y, msg->pose.pose.orientation.z, msg->pose.pose.orientation.w);
 	tf::Matrix3x3 m(t);
-	m.getRPY(robot_roll, robot_pitch, robot_yaw); // Get Roll Pitch and Yaw from the Quaternion
+	m.getRPY(robot_roll, robot_pitch, robot_yaw);	// Getting Roll Pitch and Yaw from the Quaternion
 
-	// Decide the funciton to call to kick the ball.
-	if (aligned == false)
-	{
+	// Decide the steps to kick the ball.
+	if (aligned == false) {
+
 		// Calling the function to align the robot
 		alignment(yaw, robot_yaw);
 	}
-	else
-	{
-		if (behindBall == false)
-		{
+	else{
+		if (behindBall == false) {
+
 			// Calling the function to move the robot back if it is not behind the ball
 			moveBack();
 		}
-		else
-		{
-			if (onTrajectory == false)
-			{
+		else {
+			if (onTrajectory == false) {
+
 				// Calling the function to move the robot to trajectory ball-porta
 				moveToTrajectory();
 			}
-			else
-			{
-				if (kicked == false)
-				{
+			else {
+				if (kicked == false) {
+
 					// Calling the function to kick the ball
 					kick();
 				}
-				else
-				{
-				}
+				else {}
 			}
 		}
 	}
 }
 
+
 // Callback for the model objects
-void modelCallback(const gazebo_msgs::ModelStates::ConstPtr &msg)
-{
+void modelCallback(const gazebo_msgs::ModelStates::ConstPtr &msg) {
+
 	// Position of the ball
 	ball[0] = msg->pose[1].position.x;
 	ball[1] = msg->pose[1].position.y;
@@ -273,34 +280,35 @@ void modelCallback(const gazebo_msgs::ModelStates::ConstPtr &msg)
 	porta[0] = msg->pose[2].position.x;
 	porta[1] = msg->pose[2].position.y;
 
-	m = (porta[1] - ball[1]) / (porta[0] - ball[0]);					  // Angular coefficent of the line bal--porta
-	q = (porta[0] * ball[1] - ball[0] * porta[1]) / (porta[0] - ball[0]); // y coordinates at the origin of the line ball_porta
-	yaw = atan(m);														  // Yaw angle wrt y axis of the world frame
+	m = (porta[1] - ball[1]) / (porta[0] - ball[0]);						// Angular coefficent of the line ball-porta
+	q = (porta[0] * ball[1] - ball[0] * porta[1]) / (porta[0] - ball[0]);	// y coordinates at the origin of the line ball-porta
+	yaw = atan(m);															// Yaw angle wrt x axis of the world frame
 }
 
-// Callback for the model of the moving objects
-void linkCallback(const gazebo_msgs::LinkStates::ConstPtr &msg)
-{
+
+// Callback for the model of the moving ball
+void linkCallback(const gazebo_msgs::LinkStates::ConstPtr &msg) {
+
 	// Position of the ball
 	moving_ball[0] = msg->pose[1].position.x;
 	moving_ball[1] = msg->pose[1].position.y;
 }
 
-int main(int argc, char **argv)
-{
+int main(int argc, char **argv) {
+
 	ros::init(argc, argv, "controller");
 	ros::NodeHandle n;
 	ros::Rate loop_rate(10);
-	while (1)
-	{
+	while (1) {
+
 		// Defining the Subrscribers
-		ros::Subscriber robot_sub = n.subscribe("odom", 1000, odomCallback);				   // Subcriber to the odometry of the robot
-		ros::Subscriber moodel_sub = n.subscribe("/gazebo/model_states", 1000, modelCallback); // Subcriber to the initial position of the objects - only for Gazebo
-		ros::Subscriber link_sub = n.subscribe("/gazebo/link_states", 1000, linkCallback);	 // Subcriber to the moving position of the objects - only for Gazebo
+		ros::Subscriber robot_sub = n.subscribe("odom", 1000, odomCallback);					// Subcriber to the odometry of the robot
+		ros::Subscriber moodel_sub = n.subscribe("/gazebo/model_states", 1000, modelCallback);	// Subcriber to the initial position of the objects - only for Gazebo
+		ros::Subscriber link_sub = n.subscribe("/gazebo/link_states", 1000, linkCallback);		// Subcriber to the moving position of the ball - only for Gazebo
 
 		// Defining the Publishers
-		pub = n.advertise<geometry_msgs::Twist>("cmd_vel", 100);			 // Publisher of the velocities for Gazebo
-		pub_robot = n.advertise<geometry_msgs::Twist>("robot/cmd_vel", 100); // Publisher of the velocities for Arduino
+		pub = n.advertise<geometry_msgs::Twist>("cmd_vel", 100);				// Publisher of the velocities for Gazebo
+		pub_robot = n.advertise<geometry_msgs::Twist>("robot/cmd_vel", 100);	// Publisher of the velocities for Arduino
 
 		ros::spin();
 		loop_rate.sleep();

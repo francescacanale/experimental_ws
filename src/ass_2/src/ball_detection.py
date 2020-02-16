@@ -44,7 +44,7 @@ class image_feature:
 
 	# Object Points coordinates
 	radius_ball = 3.5 # Real radius of the ball (cm)
-	self.object_point = np.array([[radius_ball, 0., 0.], [-radius_ball, 0., 0.], [0., -radius_ball, 0.], [0., radius_ball, 0.]])
+	self.object_point = np.array([[radius_ball, 0., 0.], [-radius_ball, 0., 0.], [0., -radius_ball, 0.], [0., radius_ball, 0.]]) # Coordinates of 4 points of the ball wrt ball-frame
 
     def callback(self, ros_data):
         '''Callback function of subscribed topic. 
@@ -94,7 +94,7 @@ class image_feature:
 			float_center2 = ([float_center[0]-radius, float_center[1]])
 			float_center3 = ([float_center[0], float_center[1]-radius])
 			float_center4 = ([float_center[0], float_center[1]+radius])
-			image_point = np.array([float_center1, float_center2, float_center3, float_center4])
+			image_point = np.array([float_center1, float_center2, float_center3, float_center4]) # Correspondent coordinates of the object points in the image frame
 
 			# Calling solvePnP to compute T-matrix between the object frame and the camera
 			(_, rotation_vector, translation_vector) = cv2.solvePnP(self.object_point, image_point , self.camera_matrix, self.dist_coefs)
