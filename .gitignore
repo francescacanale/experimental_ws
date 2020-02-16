@@ -24,6 +24,9 @@ devel_isolated/
 *.dox
 *.wikidoc
 
+# Ignore generated file by vscode
+*.vscode
+
 # eclipse stuff
 .project
 .cproject
