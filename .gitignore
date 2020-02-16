@@ -25,7 +25,7 @@ devel_isolated/
 *.wikidoc
 
 # Ignore generated file by vscode
-*.vscode
+.vscode
 
 # eclipse stuff
 .project

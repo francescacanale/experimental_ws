@@ -1,5 +1,9 @@
-# Experimental Robotics Laboratory - First Assignment
+# First Assignment - Node Counting Algorithm in Gazebo
 
+## GOAL OF THE ASSIGNMENT
+### The goal is to make the robots exploring the map until all the nodes are visited at least once.
+
+## GETTING STARTED
 ### Download the .zip file correspondent to the workspace in the user home folder, then unzip the package folder and access it:
 $ cd home/experimental_ws
 
@@ -44,7 +48,6 @@ The default parameters depend on the launch file the user wants to run according
 
 The description of the models of the robot can be found inside the files contained in the folder "urdf" inside the src folder of the package ass_1.
 
-## GOAL OF THE ASSIGNMENT
-### The goal is to make the robots exploring the map until all the nodes are visited at least once.
+## CRITICAL ASPECT
 A critical issue of our code is represented from the fact that sometimes during the exploration, some robots could bump in each other since the unique possible target choice for one of them is the node that also another robot is visiting at that moment. In case of crash it is adviced to stop the simulation and trying to set different initial positions for the robots.
 
