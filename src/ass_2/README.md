@@ -15,6 +15,7 @@ The robot was built using a kit that contains:
 - [Raspberry Pi 3 model A+](https://www.raspberrypi.org/products/raspberry-pi-3-model-a-plus/)
 - [Camera Module V2](https://www.raspberrypi.org/products/camera-module-v2/)
 - [Kit 4WD omni-directional wheels](https://www.amazon.it/OSOYOO-Robotico-Platform-velocit%C3%A0-Raspberry/dp/B07XRFQN8D/ref=sr_1_5?__mk_it_IT=%C3%85M%C3%85%C5%BD%C3%95%C3%91&crid=M5QEL3ZWUSSR&keywords=osoyoo+arduino+robot&qid=1581868004&sprefix=osoyoo%2Caps%2C183&sr=8-5)
+
 Additional part:
 - [RPi UPS PowerPack](https://www.amazon.it/UNIROI-Espansione-Raspberry-Ufficiale-Aggiornata/dp/B07KWTS638/ref=sr_1_2?__mk_it_IT=%C3%85M%C3%85%C5%BD%C3%95%C3%91&keywords=rasp+powerpack&qid=1581868110&sr=8-2)
 - [8 x AA battery Holder](https://www.amazon.it/interruttore-Arduinos-solenoidi-coperchio-resistente/dp/B07BY3ZDDL/ref=sr_1_7?__mk_it_IT=%C3%85M%C3%85%C5%BD%C3%95%C3%91&keywords=pack+8+pile+stilo&qid=1581868190&sr=8-7) (Not suggested)
@@ -35,6 +36,7 @@ $ catkin_make
 ```
 ### Prepare your RaspberryPi
 How to start with the Raspberry Pi [Headless Raspberry Pi 3 B+ SSH WiFi Setup - Guide](https://desertbot.io/blog/headless-raspberry-pi-3-bplus-ssh-wifi-setup).
+
 How to install ROS on the Raspberry Pi [Installing ROS Kinetic on the Raspberry Pi](http://wiki.ros.org/ROSberryPi/Installing%20ROS%20Kinetic%20on%20the%20Raspberry%20Pi)
 
 ### Link between PC and RaspberryPi:
