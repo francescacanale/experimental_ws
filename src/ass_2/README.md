@@ -37,7 +37,7 @@ $ catkin_make
 ### Prepare your RaspberryPi
 How to start with the Raspberry Pi [Headless Raspberry Pi 3 B+ SSH WiFi Setup - Guide](https://desertbot.io/blog/headless-raspberry-pi-3-bplus-ssh-wifi-setup).
 
-How to install ROS on the Raspberry Pi [Installing ROS Kinetic on the Raspberry Pi](http://wiki.ros.org/ROSberryPi/Installing%20ROS%20Kinetic%20on%20the%20Raspberry%20Pi)
+How to install ROS on the Raspberry Pi [Installing ROS Kinetic on the Raspberry Pi](http://wiki.ros.org/ROSberryPi/Installing%20ROS%20Kinetic%20on%20the%20Raspberry%20Pi).
 
 ### Link between PC and RaspberryPi:
 Enter in the raspberry via ssh.
@@ -98,7 +98,9 @@ and run the simulation.
 
 You can easly change the starting position/orientation of the robot by changing it in the [Launch file](https://github.com/francescacanale/experimental_ws/blob/master/src/ass_2/launch/gazebo_robot_world.launch).
 
-You can also change the starting position of the ball and the goal by changing it in the [Gazebo World file](https://github.com/francescacanale/experimental_ws/blob/master/src/crestino_gazebo/worlds/crestino.world)
+You can also change the starting position of the ball and the goal by changing it in the [Gazebo World file](https://github.com/francescacanale/experimental_ws/blob/master/src/crestino_gazebo/worlds/crestino.world).
+
+If the simulation does not start for some missing gazebo models, you can add the folders [Gazebo models](https://github.com/francescacanale/experimental_ws/blob/master/src/crestino_gazebo/models) in your gazebo model folder (e.g. /root/.gazebo/models).
 
 ## TASK 3: MAKE THE REAL ROBOT MOVE
 With roscore active on RaspPi, open a new RaspPi terminal and go inside catkin workspace:
