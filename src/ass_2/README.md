@@ -46,6 +46,8 @@ How to start with the Raspberry Pi [Headless Raspberry Pi 3 B+ SSH WiFi Setup - 
 
 How to install ROS on the Raspberry Pi [Installing ROS Kinetic on the Raspberry Pi](http://wiki.ros.org/ROSberryPi/Installing%20ROS%20Kinetic%20on%20the%20Raspberry%20Pi).
 
+How to install OpenCV on the Raspberry Pi [Using Pi camera with OpenCV for Raspberry Pi](https://neverbenever.wordpress.com/2015/05/18/how-to-use-pi-camera-with-opencv-for-raspberry-pi/).
+
 ### Link between PC and RaspberryPi:
 Enter in the raspberry via ssh.
 

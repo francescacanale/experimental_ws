@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <launch>
 
-  <!-- Starting the example in the empty world scenario -->
+  <!-- Starting the example in the customized world scenario -->
   <include file="$(find gazebo_ros)/launch/empty_world.launch"> 
     <arg name="world_name" value="$(find crestino_gazebo)/worlds/crestino.world"/>	
     <arg name="paused" value="true"/>
