@@ -6,7 +6,7 @@
 ## CODE ARCHITECTURE
 Our code architecture can be summarized in three tasks described in the following picture:
 <p align="center">
- <img src="Images/ExRob Diagram.png" width="800"/>
+ <img src="Images/ExRob Diagram.png"/>
 </p>
 
 ## THE ROBOT
