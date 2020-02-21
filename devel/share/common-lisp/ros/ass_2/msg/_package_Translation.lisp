@@ -1,5 +1,7 @@
 (cl:in-package ass_2-msg)
-(cl:export '(X-VAL
+(cl:export '(HEADER-VAL
+          HEADER
+          X-VAL
           X
           Y-VAL
           Y
