@@ -6,7 +6,7 @@
 ## CODE ARCHITECTURE
 Our code architecture can be summarized in three tasks described in the following picture:
 <p align="center">
- <img src="Images/ExRob Diagram.png" width="1000"/>
+ <img src="Images/ExRob Diagram.png" width="800"/>
 </p>
 
 ## THE ROBOT
@@ -14,7 +14,7 @@ Our code architecture can be summarized in three tasks described in the followin
  <img src="Images/up_view.jpg" width="400"/>
 </p>
 <p align="center">
- <img src="Images/front_view.jpg" width="400"/>/>
+ <img src="Images/front_view.jpg" width="400"/>
 </p>
 
 The robot was built using a kit that contains:
