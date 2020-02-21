@@ -6,15 +6,15 @@
 ## CODE ARCHITECTURE
 Our code architecture can be summarized in three tasks described in the following picture:
 <p align="center">
- <img src="ExRob Diagram.png" width="200"/>
+ <img src="ExRob Diagram.png"/>
 </p>
 
 ## THE ROBOT
 <p align="center">
- <img src="up_view.jpg" width="200"/>
+ <img src="up_view.jpg" width="400"/>
 </p>
 <p align="center">
- <img src="front_view.jpg" width="200"/>/>
+ <img src="front_view.jpg" width="400"/>/>
 </p>
 The robot was built using a kit that contains:
 - [Arduino Due](https://www.arduino.cc/en/Guide/ArduinoDue)
