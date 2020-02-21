@@ -6,10 +6,16 @@
 ## CODE ARCHITECTURE
 Our code architecture can be summarized in three tasks described in the following picture:
 <p align="center">
- <img src="ExRob Diagram.png"/>
+ <img src="ExRob Diagram.png" width="200"/>
 </p>
 
 ## THE ROBOT
+<p align="center">
+ <img src="up_view.jpg" width="200"/>
+</p>
+<p align="center">
+ <img src="front_view.jpg" width="200"/>/>
+</p>
 The robot was built using a kit that contains:
 - [Arduino Due](https://www.arduino.cc/en/Guide/ArduinoDue)
 - [Raspberry Pi 3 model A+](https://www.raspberrypi.org/products/raspberry-pi-3-model-a-plus/)
@@ -107,7 +113,7 @@ With roscore active on RaspPi, open a new RaspPi terminal and go inside catkin w
 ```
 $ cd catkin_ws
 ```
-then run the [Motor Code Raspberry Pi](https://github.com/francescacanale/experimental_ws/blob/master/src/motor_driver/scripts/motor_driver.py):
+then run the [Motor Code Raspberry Pi](https://github.com/francescacanale/experimental_ws/blob/master/src/ass_2/motor_driver/scripts/motor_driver.py):
 ```
 $ rosrun motor_driver motor_driver.py
 ```
