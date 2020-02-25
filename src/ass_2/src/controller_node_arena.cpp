@@ -72,7 +72,7 @@ void alignment(float yaw, double robot_yaw) {
 	float misalignment = yaw - robot_yaw;
 
 	// Understand the fastest way to align
-	if (robot_yaw > yaw + 0.05 && robot_yaw < yaw + M_PI - 0.05 && abs(misalignment) > 0.05) {
+	if ((robot_yaw > yaw + 0.05 || robot_yaw < yaw + M_PI - 0.05) && abs(misalignment) > 0.05) {
 		cout << "CLOCKWISE\n"; 										// Moving the robot clockwise
 		geometry_msgs::Twist vel;
 		vel.angular.z = -0.3 * misalignment / abs(misalignment);	// Giving an angular velocity on z axis
