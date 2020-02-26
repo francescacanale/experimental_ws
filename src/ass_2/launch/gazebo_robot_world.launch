@@ -11,7 +11,7 @@
   <arg name="model" default="$(find ass_2)/urdf/robot.xacro" />
   <arg name="x" default="2"/>
   <arg name="y" default="4"/>
-  <arg name="yaw" default="3.1415"/>
+  <arg name="yaw" default="0"/>
 
   <!-- Load the URDF into the ROS Parameter Server -->
   <param name="robot_description" 

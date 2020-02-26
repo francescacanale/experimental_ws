@@ -57,15 +57,23 @@ void alignment(float yaw, double robot_yaw) {
 	float misalignment = yaw - robot_yaw;
 
 	// Understand the fastest way to align
-	if ((robot_yaw > yaw + 0.05 || robot_yaw < yaw + M_PI - 0.05) && abs(misalignment) > 0.05) {
-		cout << "CLOCKWISE\n"; 						// Moving the robot clockwise
+	if ((robot_yaw > yaw + M_PI + 0.05 || robot_yaw < yaw - 0.05) && abs(misalignment) > 0.03) {
+		cout << "ANTICLOCKWISE\n";					// Moving the robot anti-clockwise
 		geometry_msgs::Twist vel;
-		vel.angular.z = - 0.3 * misalignment / abs(misalignment);	// Giving an angular velocity on z axis
+		vel.angular.z = + 0.3;	// Giving an angular velocity on z axis
 		pub.publish(vel);						// Publishing the velocity
 		if (controlVelocities(vel))
 			pub_robot.publish(vel);
 	}
-	else if ((robot_yaw > yaw + M_PI + 0.05 || robot_yaw < yaw - 0.05) && abs(misalignment) > 0.05) {
+	else if ((robot_yaw > yaw + 0.05 && robot_yaw < yaw + M_PI - 0.05) && abs(misalignment) > 0.03) {
+		cout << "CLOCKWISE\n"; 						// Moving the robot clockwise
+		geometry_msgs::Twist vel;
+		vel.angular.z = - 0.3;	// Giving an angular velocity on z axis
+		pub.publish(vel);						// Publishing the velocity
+		if (controlVelocities(vel))
+			pub_robot.publish(vel);
+	}
+	else if ((robot_yaw > yaw + M_PI + 0.05 || robot_yaw < yaw - 0.05) && abs(misalignment) > 0.03) {
 		cout << "ANTICLOCKWISE\n";					// Moving the robot anti-clockwise
 		geometry_msgs::Twist vel;
 		vel.angular.z = + 0.3 * misalignment / abs(misalignment);	// Giving an angular velocity on z axis
@@ -95,7 +103,7 @@ void moveBack() {
 	// Case 1: Parallel vertical lines
 	if (abs(q) > 100) {
 		y_robot_new = robot[1];			// If the lines are vertical the y of the robot remains the same
-		if (ball[1] < y_robot_new + 1) { 	// If the robot after the translation will not be behind the ball
+		if (ball[1] < y_robot_new + 2) { 	// If the robot after the translation will not be behind the ball
 			cout << "MOVING BACK\n";        // Moving the robot back
 			geometry_msgs::Twist vel;
 			vel.linear.x = -0.2;		// Giving a linear velocity on x axis
@@ -118,7 +126,7 @@ void moveBack() {
 			y_robot_new = robot[1] - abs(distance_rette * sin(m - M_PI / 2));
 			sign_v = 1;
 		}
-		if (ball[1] < y_robot_new + 1) { 	// If the robot after the translation will not be behind the ball
+		if (ball[1] < y_robot_new + 2) { 	// If the robot after the translation will not be behind the ball
 			cout << "MOVING BACK\n";        // Moving the robot back
 			geometry_msgs::Twist vel;
 			vel.linear.x = -0.2;		// Giving a linear velocity on x axis
@@ -141,7 +149,7 @@ void moveBack() {
 			y_robot_new = robot[1] + abs(distance_rette * sin(m - M_PI / 2));
 			sign_v = -1;
 		}
-		if (ball[1] < y_robot_new + 1) {	// If the robot after the translation will not be behind the ball
+		if (ball[1] < y_robot_new + 2) {	// If the robot after the translation will not be behind the ball
 			cout << "MOVING BACK\n";        // Moving the robot back
 			geometry_msgs::Twist vel;
 			vel.linear.x = -0.2;		// Giving a linear velocity on x axis
