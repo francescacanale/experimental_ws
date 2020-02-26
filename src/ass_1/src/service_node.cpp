@@ -11,7 +11,7 @@
 
 using namespace std;
 
-int **Map;					// Matrix to storage the map
+int **Map;			// Matrix to storage the map
 bool completed = false;		// Variable for kwnowing when the whole map has been visited
 
 // Variables for knowing if I'm at the end of the map
@@ -20,15 +20,15 @@ bool endofmapR = false;
 bool endofmapU = false;
 bool endofmapL = false;
 
-size_t row, col;			// Dimension of the map/matrix
+size_t row, col;		// Dimension of the map/matrix
 ros::Publisher pub_completed;
 
 
 // Function that, knowing the actual odometry of the robot, decide which is the target position and which direction of the velocity the robot needs to get to the target
 int *function_map(int a, int b)
   {
-	int x = a;					// Actual x coordinate of the robot
- 	int y = b;					// Actual y coordinate of the robot
+	int x = a;			// Actual x coordinate of the robot
+ 	int y = b;			// Actual y coordinate of the robot
  	int *target = new int[4];	// 0 = target_position_x, 1 = target_position_y, 2 = velocity_along_x, 3 = velocity_along_y
 	target[2] = 0; 
 	target[3] = 0;
@@ -67,7 +67,7 @@ int *function_map(int a, int b)
 
 	// Taking the robot inside the map if it is not already
 	if (x < 0 || x > row-1 || y < 0 || y > col-1) {
-		if (x < 0 && y >= 0 && y < col-1) {				// If the robot is above the up border
+		if (x < 0 && y >= 0 && y < col-1) {			// If the robot is above the up border
 			cout << "The robot is above the up border\n";
 			if (Map[0][y] != -1) {
 				target[0] = 0;
@@ -165,7 +165,7 @@ int *function_map(int a, int b)
 				border_left = true;		// All the positions that are in the first column of the matrix
 			}
 			else if (y == (col-1)) {
-				border_right = true;	// All the positions that are in the last column of the matrix
+				border_right = true;		// All the positions that are in the last column of the matrix
 			}
 			else {
 				center = true;			// All the positions that are not corners or borders
@@ -424,9 +424,9 @@ int *function_map(int a, int b)
 		for (size_t j = 0; j < col; ++j){
 			if(Map[i][j] != -1)
 				cout<<" ";
-				std::cout <<  Map[i][j] << " ";
-        }	
-        std::cout << "\n";
+			std::cout <<  Map[i][j] << " ";
+        	}	
+        	std::cout << "\n";
 	}
 	std::cout << "------------------\n";
 
