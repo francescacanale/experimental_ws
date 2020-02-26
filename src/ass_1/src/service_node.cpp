@@ -20,7 +20,7 @@ bool endofmapR = false;
 bool endofmapU = false;
 bool endofmapL = false;
 
-size_t row, col;	// Dimension of the map/matrix
+size_t row, col;			// Dimension of the map/matrix
 ros::Publisher pub_completed;
 
 
@@ -421,18 +421,18 @@ int *function_map(int a, int b)
 	// Printing the updated map
 	cout << "Updated map:\n";
 	for (size_t i = 0; i < row; ++i) {
-        for (size_t j = 0; j < col; ++j){
-		if(Map[i][j] != -1)
-			cout<<" ";
-        	std::cout <<  Map[i][j] << " ";
+		for (size_t j = 0; j < col; ++j){
+			if(Map[i][j] != -1)
+				cout<<" ";
+				std::cout <<  Map[i][j] << " ";
         }	
         std::cout << "\n";
-    }
+	}
 	std::cout << "------------------\n";
 
     
 	int flag = 0; 
-    for (int i=0; i<row; i++) {
+	for (int i=0; i<row; i++) {
 		for (int j=0; j<col; j++) {
 			if( Map[i][j] != 0)		// Counting how many elements of the map are different than zero
 				flag ++;
@@ -479,37 +479,37 @@ int main(int argc, char **argv)
 	std::ifstream inFile("/home/experimental_ws/src/ass_1/map/map_1.txt");
 
 	// Reading the number of column and rows of the matrix from the file.txt
-    if(inFile) {
-        inFile >> row >> col;
-    }
+	if(inFile) {
+		inFile >> row >> col;
+	}
 
 	// Creating matrix for the map
-    Map = new int*[row];
-    for(size_t i = 0; i < row; ++i) {
-        Map[i] = new int[col];
-    }
+	Map = new int*[row];
+	for(size_t i = 0; i < row; ++i) {
+		Map[i] = new int[col];
+	}
 
 	// Reading the matrix
-    while(inFile) {
-        std::string dummy;
-        getline(inFile, dummy);
-        for (size_t i = 0; i < row; ++i) {
-            		for (size_t j = 0; j < col; ++j) {
-                	inFile >> Map[i][j];
-            	}
-        }
-    }
+	while(inFile) {
+		std::string dummy;
+		getline(inFile, dummy);
+		for (size_t i = 0; i < row; ++i) {
+			for (size_t j = 0; j < col; ++j) {
+				inFile >> Map[i][j];
+			}
+		}
+	}
 
 	// Printing the map
 	cout<< "Initial map: \n";
 	for (size_t i = 0; i < row; ++i) {
-        for (size_t j = 0; j < col; ++j){
-		if(Map[i][j] != -1)
-			cout<<" ";
-        	std::cout <<  Map[i][j] << " ";
-        }	
-        std::cout << "\n";
-    }
+		for (size_t j = 0; j < col; ++j){
+			if(Map[i][j] != -1)
+				cout<<" ";
+			std::cout <<  Map[i][j] << " ";
+		}	
+		std::cout << "\n";
+	}
 
 	ros::init(argc, argv, "goal_position_server");
 	ros::NodeHandle n;
@@ -519,7 +519,7 @@ int main(int argc, char **argv)
 
 	if (completed = true) {
 		for (size_t i = 0; i < row; ++i ) {
-		    delete [] Map[i];
+			delete [] Map[i];
 		}
 		delete [] Map;
 	}

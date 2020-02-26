@@ -50,8 +50,8 @@ float euclideanDistance(double actual_x, double actual_y, int goal_x, int goal_y
 void odomCallback(const nav_msgs::Odometry::ConstPtr& msg) {
 	
 	// Odometry of the robot
-    double x_current = msg->pose.pose.position.x;
-    double y_current = msg->pose.pose.position.y;
+	double x_current = msg->pose.pose.position.x;
+	double y_current = msg->pose.pose.position.y;
 
 	if (arrived == true) {
 		
@@ -75,9 +75,9 @@ void odomCallback(const nav_msgs::Odometry::ConstPtr& msg) {
 	// If I'm not arrived to the target position yet, I give the velocities to the robot
 	if(distance >= distance_tolerance && completed == false) { 
 		geometry_msgs::Twist vel;
-        vel.linear.x = 0.5 * goal[2];
+		vel.linear.x = 0.5 * goal[2];
 		vel.linear.y = 0.5 * goal[3];
-        pub.publish(vel);
+		pub.publish(vel);
 	}
 	// If I'm arrived to the traget position the robot stops
 	else { 
