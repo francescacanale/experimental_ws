@@ -5,7 +5,7 @@ from std_msgs.msg import String
 from geometry_msgs.msg import Twist
 import serial
 
-#This script receives messages from "/cmd_vel" and translates them 
+#This script receives messages from "/robot/cmd_vel" and translates them 
 #to the rotation signal of each motor. Then, it sends this signals to Arduino. 
 #At the same time, it receives messages from Arduino and publishes them to /arduino.
 
