@@ -13,7 +13,7 @@ class driver:
     def __init__(self):
         # init ros
         rospy.init_node('car_driver', anonymous=True)           #initialize the node "car_driver"
-        rospy.Subscriber('/cmd_vel', Twist, self.get_cmd_vel)   #init sub to "cmd_vel"
+        rospy.Subscriber('/robot/cmd_vel', Twist, self.get_cmd_vel)   #init sub to "cmd_vel"
         self.ser = serial.Serial('/dev/ttyACM0', 115200)        #init serial transmission via USB
         self.get_arduino_message()                              #init the arduino msg*
 

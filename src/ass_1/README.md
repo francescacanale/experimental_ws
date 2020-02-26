@@ -14,11 +14,10 @@ $ cd home/experimental_ws
 `$ catkin_make`
 
 ## MAP
-There are 4 maps available that the user can choose. To load the desired map the user has to change the name of the map modifying the string with its name at line[479] in the service_node.cpp. The user can find this executable accessing the folder through the command:
+There are 4 maps available that the user can choose. To load the desired map the user has to change the name of the map modifying the string with its name at line 479 in the [service_node.cpp](https://github.com/francescacanale/experimental_ws/blob/master/src/ass_1/src/service_node.cpp) changing also the path of the map folder. The user can find this executable accessing the folder through the command:
 `$ cd /src/ass_1/src`
 
-The names of the possible maps that the user can choose and their dimensions are: "map_1.txt" (6x10), "map_2.txt" (12x6), "map_3.txt" (6x6), "map_4.txt" (11x13). These can be found in the following path: 
-/home/experimental_ws/src/ass_1/map
+The names of the possible maps that the user can choose and their dimensions are: "map_1.txt" (6x10), "map_2.txt" (12x6), "map_3.txt" (6x6), "map_4.txt" (11x13). These can be found in the [map folder](https://github.com/francescacanale/experimental_ws/tree/master/src/ass_1/map).
 
 Each map corresponds to a matrix composed by values equal to:
 - -1 which correspond to an obstacle
@@ -26,7 +25,7 @@ Each map corresponds to a matrix composed by values equal to:
 All the nodes which are not obstacles are initialized to 0 in the txt file corresponding to the maps and once the robot visits one of them, their value will be incremented by one unit.
 
 ## ROSLAUNCH
-There are 4 launch files in the launch folder; the difference between them is the number of robots spawned during the initialization and their initial positions. In order to run a launchfile, once accessed the ass_1 package folder, write on the terminal the following command :
+There are 4 launch files in the [launch folder](https://github.com/francescacanale/experimental_ws/tree/master/src/ass_1/launch); the difference between them is the number of robots spawned during the initialization and their initial positions. In order to run a launchfile, once accessed the ass_1 package folder, write on the terminal the following command :
 `$ roslaunch ass_1 <name_launch>`
 
 To select the desired launchfile the user has to substitute the variable <name_launch> with one of the following string depending on which type of simulation he wants to run:
