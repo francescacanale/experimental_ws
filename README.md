@@ -12,5 +12,5 @@
 
 
 
-Robotics Engineering Master - 2nd year
+Robotics Engineering Master - 2nd year   
 University of Genoa
