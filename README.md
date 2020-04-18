@@ -3,4 +3,9 @@
 * [Assignment 1](https://github.com/francescacanale/experimental_ws/tree/master/src/ass_1) Node Counting Algorithm in Gazebo
 * [Assignment 2](https://github.com/francescacanale/experimental_ws/tree/master/src/ass_2) Autonomous Soccer-Robot
 
-Done in collaborations with [filippogandolfi](https://github.com/filippogandolfi), [tommi95](https://github.com/tommi95)
+## Authors
+| Name | E-mail |
+|------|--------|
+| [Francesca Canale](https://github.com/francescacanale) | francesca.canale.95@gmail.com |
+| [Filippo Gandolfi](https://github.com/filippogandolfi) | didi.gandolfi@gmail.com |
+| [Tommaso Gruppi](https://github.com/tommi95) | tommygruppi@gmail.com |
