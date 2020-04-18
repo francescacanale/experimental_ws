@@ -9,3 +9,8 @@
 | [Francesca Canale](https://github.com/francescacanale) | francesca.canale.95@gmail.com |
 | [Filippo Gandolfi](https://github.com/filippogandolfi) | didi.gandolfi@gmail.com |
 | [Tommaso Gruppi](https://github.com/tommi95) | tommygruppi@gmail.com |
+
+
+
+Robotics Engineering Master - 2nd year
+University of Genoa
